@@ -13,14 +13,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ICT',
-      
       theme: ThemeData(
-        textTheme: TextTheme(
-      bodyText1: TextStyle(fontFamily: 'Poppins'), // Aplica Poppins a todos los textos
-      // Agrega más estilos de texto aquí si es necesario
-    ),
+        //textTheme: TextTheme(
+        //bodyText1: TextStyle(fontFamily: 'Poppins'), // Aplica Poppins a todos los textos
+        // Agrega más estilos de texto aquí si es necesario
+        //  ),
         colorScheme:
-            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 14, 2, 43)),
+            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 67, 2, 80)),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Indice de Competitividad Textil'),
@@ -41,10 +40,18 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        //backgroundColor: Colors.gre,
+        backgroundColor: Color.fromARGB(255, 136, 133, 133),
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
+          backgroundColor: Color.fromARGB(166, 134, 13, 108),
+          title: Center(
+            child: Text(
+              widget.title,
+              style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
+          ),
         ),
         body: Center(
           child: Column(
@@ -58,30 +65,41 @@ class _MyHomePageState extends State<MyHomePage> {
                   height: 80,
                 ),
               ),
-              
-              Image.asset(
+              /*Image.asset(
                 'assets/images/indicator.png',
                 width: 250,
                 height: 250,
                 fit: BoxFit.cover,
+              ),*/
+              Container(
+                padding: EdgeInsets.only(top: 50, bottom: 20),
+                width: 200,
+                child: Text(
+                  "Aplicativo de Indice de Competitividad Textil",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Registro()),
-              );
+                    context,
+                    MaterialPageRoute(builder: (context) => Registro()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 12, 145, 56),
+                  backgroundColor: Color.fromARGB(166, 134, 13, 108),
                   elevation: 3,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
                 ),
                 child: const Text(
                   'Iniciar Evaluación',
-                  style: TextStyle(color: Colors.white,fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
               ),
             ],
