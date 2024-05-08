@@ -4,22 +4,73 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
 import 'package:kg_charts/kg_charts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class Results extends StatelessWidget {
+class Results extends StatefulWidget {
+  @override
+  State<Results> createState() => _ResultsState();
+}
+
+class _ResultsState extends State<Results> {
+  int? puntajeTotal;
+  List<String> Dimensiones = [
+    "Gestión Productiva Primaria",
+    "Gestión de Diseño y Desarrollo de Productos",
+    "Gestión de Acabados Textiles",
+    "Gestión de la Comerzializacion",
+    "Gestión de Finanzas",
+    "Gestión de la Tributación",
+    "Educación",
+    "Transporte",
+    "Telecomunicaciones",
+    "Salud",
+    "Agua y Saneamiento",
+    "Gestión Ambiental",
+    "Tecnologiía  e Innovación",
+    "Gestión Organizacional",
+  ];
+  List<int> puntajeDimension = List.filled(14, 0); // Rellena la lista con 0s
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    // La función fetchData es async
+    final client = Supabase.instance.client;
+    final response = await client.from('Respuestas').select();
+    puntajeTotal = 0;
+    for (var pregunta in response) {
+      puntajeTotal = puntajeTotal! + (pregunta['score'] as int);
+      for (var i = 0; i < Dimensiones.length; i++) {
+        if (Dimensiones[i] == pregunta['variable']) {
+          puntajeDimension[i] += (pregunta['score'] as int);
+        }
+      }
+    }
+    setState(() {});
+    print(puntajeTotal);
+    print(puntajeDimension);
+  }
+
   @override
   Widget build(BuildContext context) {
-   
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(166, 134, 13, 108),
-          title: const Text(
-            'Resultados',
-            style: TextStyle(
-                fontSize: 25.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.white),
+          automaticallyImplyLeading: false,
+          title: Center(
+            child: const Text(
+              'Resultados',
+              style: TextStyle(
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
+            ),
           ),
         ),
         body: SingleChildScrollView(
@@ -27,65 +78,75 @@ class Results extends StatelessWidget {
             child: Container(
               child: Column(
                 children: [
-                  DonaConValorCentral(),
-                  const Text(
-                    'Su nivel es:',
+                  puntajeTotal == null
+                      ? CircularProgressIndicator()
+                      : DonaConValorCentral(puntaje: puntajeTotal!),
+                  Text(
+                    'Su nivel es: ',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  RandomPositionContainer(
-                    children: const [
-                      CircleWithText('1°'),
-                      CircleWithText('2°'),
-                      CircleWithText('3°'),
-                      CircleWithText('4°'),
-                      CircleWithText('5°', hasBorder: true),
-                    ],
-                  ),
+                  puntajeTotal == null
+                      ? CircularProgressIndicator()
+                      : RandomPositionContainer(
+                          children: [
+                            CircleWithText('1°',
+                                hasBorder:
+                                    (puntajeTotal! >= 0 && puntajeTotal! <= 20)
+                                        ? true
+                                        : false),
+                            CircleWithText('2°',
+                                hasBorder:
+                                    (puntajeTotal! >= 21 && puntajeTotal! <= 40)
+                                        ? true
+                                        : false),
+                            CircleWithText('3°',
+                                hasBorder:
+                                    (puntajeTotal! >= 41 && puntajeTotal! <= 60)
+                                        ? true
+                                        : false),
+                            CircleWithText('4°',
+                                hasBorder:
+                                    (puntajeTotal! >= 61 && puntajeTotal! <= 80)
+                                        ? true
+                                        : false),
+                            CircleWithText('5°',
+                                hasBorder: (puntajeTotal! >= 81 &&
+                                        puntajeTotal! <= 100)
+                                    ? true
+                                    : false),
+                          ],
+                        ),
                   RadarWidget(
                     skewing: 0,
                     radarMap: RadarMapModel(
                       legend: [
-                        LegendModel('10/10', const Color(0XFF0EBD8D)),
+                        LegendModel('', const Color(0XFF0EBD8D)),
                       ],
                       indicator: [
-                        IndicatorModel("Gestión Productiva Primaria", 100),
+                        IndicatorModel("G. Productiva Primaria", 100),
                         IndicatorModel(
-                            "Gestión de Diseño y Desarrollo de Productos", 100),
-                        IndicatorModel("Gestión de Acabados Textiles", 100),
-                        IndicatorModel("Gestión de la Comerzializacion", 100),
-                        IndicatorModel("Gestión de Finanzas", 100),
-                        IndicatorModel("Gestión de la Tributación", 100),
+                            "G. de Diseño y Desarrollo de Productos", 100),
+                        IndicatorModel("G. de Acabados Textiles", 100),
+                        IndicatorModel("G. de la Comerzializacion", 100),
+                        IndicatorModel("G. de Finanzas", 100),
+                        IndicatorModel("G. Tributación", 100),
                         IndicatorModel("Educación", 100),
                         IndicatorModel("Transporte", 100),
                         IndicatorModel("Telecomunicaciones", 100),
                         IndicatorModel("Salud", 100),
                         IndicatorModel("Agua y Saneamiento", 100),
-                        IndicatorModel("Gestión Ambiental", 100),
+                        IndicatorModel("G. Ambiental", 100),
                         IndicatorModel("Tecnologiía  e Innovación", 100),
-                        IndicatorModel("Gestión Organizacional", 100),
+                        IndicatorModel("G. Organizacional", 100),
                       ],
                       data: [
                         //   MapDataModel([48,32.04,1.00,94.5,19,60,50,30,19,60,50]),
                         //   MapDataModel([42.59,34.04,1.10,68,99,30,19,60,50,19,30]),
-                        MapDataModel([
-                          100,
-                          90,
-                          90,
-                          90,
-                          10,
-                          20,
-                          100,
-                          90,
-                          90,
-                          90,
-                          90,
-                          20,
-                          80,
-                          20
-                        ]),
+                        MapDataModel(
+                            puntajeDimension.map((e) => e.toDouble()).toList()),
                       ],
                       radius: 105,
                       duration: 2000,
@@ -112,13 +173,18 @@ class Results extends StatelessWidget {
                     },
                     outLineText: (data, max) => "${data * 100 ~/ max}%",
                   ),
-                  Table(),
+                  puntajeTotal == null
+                      ? CircularProgressIndicator()
+                      : Table(
+                    puntajeDimension: puntajeDimension,
+                  ),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 20),
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(166, 134, 13, 108),
+                        backgroundColor:
+                            const Color.fromARGB(166, 134, 13, 108),
                         elevation: 3,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 30, vertical: 10),
@@ -137,14 +203,32 @@ class Results extends StatelessWidget {
       ),
     );
   }
+
+  /*void fetchData() async {
+   
+  }*/
 }
 
-class DonaConValorCentral extends StatelessWidget {
-  final List<_ChartData> data = [
-    _ChartData('Gold', 12, const Color.fromRGBO(71, 5, 116, 1)),
-    _ChartData('Gold', 100, Colors.grey),
-    //_ChartData('Gold', 100),
-  ];
+class DonaConValorCentral extends StatefulWidget {
+  final int puntaje;
+
+  const DonaConValorCentral({super.key, required this.puntaje});
+  @override
+  State<DonaConValorCentral> createState() => _DonaConValorCentralState();
+}
+
+class _DonaConValorCentralState extends State<DonaConValorCentral> {
+  List<_ChartData> data = [];
+  @override
+  void initState() {
+    super.initState();
+    print('el puntaje es widget.puntaje ${widget.puntaje}');
+    data = [
+      _ChartData('Gold', widget.puntaje.toDouble(),
+          const Color.fromRGBO(71, 5, 116, 1)),
+      _ChartData('Gold', 100, Colors.grey),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,8 +356,10 @@ class RandomPositionContainer extends StatelessWidget {
   }
 }
 
-
 class Table extends StatefulWidget {
+  final List<int> puntajeDimension;
+
+  const Table({super.key, required this.puntajeDimension});
   @override
   _TableState createState() => _TableState();
 }
@@ -284,7 +370,7 @@ class _TableState extends State<Table> {
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 14; i++) {
       tableData.add([
         'Fila ${i + 1}, Celda 1',
         'Fila ${i + 1}, Celda 2',
@@ -293,7 +379,7 @@ class _TableState extends State<Table> {
       ]);
     }
     tableData[0][0] = "Gestión Productiva Primaria";
-    tableData[1][0] ="Gestión de Diseño y Desarrollo de Productos";
+    tableData[1][0] = "Gestión de Diseño y Desarrollo de Productos";
     tableData[2][0] = "Gestión de Acabados Textiles";
     tableData[3][0] = "Gestión de la Comerzializacion";
     tableData[4][0] = "Gestión de Finanzas";
@@ -306,12 +392,35 @@ class _TableState extends State<Table> {
     tableData[11][0] = "Gestión Ambiental";
     tableData[12][0] = "Tecnologiía  e Innovación";
     tableData[13][0] = "Gestión Organizacional";
+
+    tableData[0][1] = "90";
+    tableData[1][1] = "171";
+    tableData[2][1] = "111";
+    tableData[3][1] = "50";
+    tableData[4][1] = "50";
+    tableData[5][1] = "50";
+    tableData[6][1] = "50";
+    tableData[7][1] = "50";
+    tableData[8][1] = "50";
+    tableData[9][1] = "50";
+    tableData[10][1] = "50";
+    tableData[11][1] = "50";
+    tableData[12][1] = "50";
+    tableData[13][1] = "150";
+    print("tablaassasdasdasdas");
+    print(widget.puntajeDimension);
+    for (int i = 0; i < 14; i++) {
+      tableData[i][2] = widget.puntajeDimension[i].toString();
+      double porcentaje =
+          widget.puntajeDimension[i] / int.parse(tableData[i][1]) * 100.0;
+      tableData[i][3] = '$porcentaje%';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
+      scrollDirection: Axis.horizontal,
       child: DataTable(
         columns: const [
           DataColumn(label: Text('Factor')),

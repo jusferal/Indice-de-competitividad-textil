@@ -1,113 +1,225 @@
 import 'package:flutter/material.dart';
 import 'package:ict/formulario.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class Registro extends StatelessWidget {
-  const Registro({super.key});
+class Registro extends StatefulWidget {
+  const Registro({Key? key}) : super(key: key);
 
+  @override
+  _RegistroState createState() => _RegistroState();
+}
+
+class _RegistroState extends State<Registro> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _nombreController = TextEditingController();
+  final TextEditingController _dniController = TextEditingController();
+  final TextEditingController _celularController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _regionController = TextEditingController();
+  final TextEditingController _provinciaController = TextEditingController();
+  final TextEditingController _distritoController = TextEditingController();
+  final TextEditingController _direccionController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(166, 134, 13, 108),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        title: Center(
-          child: Text(
-            "Registro de Datos",
-            style: TextStyle(
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color.fromARGB(166, 134, 13, 108),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          title: const Center(
+            child: Text(
+              "Registro de Datos",
+              style: TextStyle(
                 fontSize: 25.0,
                 fontWeight: FontWeight.bold,
-                color: Colors.white),
+                color: Colors.white,
+              ),
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Form(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      'Datos de Contacto',
-                      style: TextStyle(
-                          fontSize: 20.0, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10.0),
-                    TextFormCustom(label: 'Nombre/Razon Social'),
-                    TextFormCustom(label: 'DNI/RUC'),
-                    TextFormCustom(
-                        label: 'Celular', keyboard: TextInputType.phone),
-                    TextFormCustom(
-                      label: 'Correo Electrónico',
-                      keyboard: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 20.0),
-                    const Text(
-                      'Datos de Ubicación',
-                      style: TextStyle(
-                          fontSize: 20.0, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 10.0),
-                    TextFormCustom(label: 'Región'),
-                    TextFormCustom(label: 'Provincia'),
-                    TextFormCustom(label: 'Distrito'),
-                    TextFormCustom(
-                      label: 'Dirección',
-                      keyboard: TextInputType.streetAddress,
-                    ),
-                    const SizedBox(height: 20.0),
-                    Container(
-                      height: 40,
-                      margin: EdgeInsets.symmetric(horizontal: 100),
-                      child: ElevatedButton(
-                        onPressed: () {
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.always,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Datos de Contacto',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10.0),
+                  TextFormCustom(
+                    label: 'Nombre/Razon Social',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese este campo';
+                      }
+                      return null;
+                    },
+                    controller: _nombreController,
+                  ),
+                  TextFormCustom(
+                    label: 'DNI/RUC',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese este campo';
+                      }
+                      return null;
+                    },
+                    controller: _dniController,
+                  ),
+                  TextFormCustom(
+                    label: 'Celular',
+                    keyboard: TextInputType.phone,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese este campo';
+                      }
+                      return null;
+                    },
+                    controller: _celularController,
+                  ),
+                  TextFormCustom(
+                    label: 'Correo Electrónico',
+                    keyboard: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese este campo';
+                      } else if (!value.contains('@')) {
+                        return 'Ingrese un correo electrónico válido';
+                      }
+                      return null;
+                    },
+                    controller: _emailController,
+                  ),
+                  const SizedBox(height: 20.0),
+                  const Text(
+                    'Datos de Ubicación',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10.0),
+                  TextFormCustom(
+                    label: 'Región',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese este campo';
+                      }
+                      return null;
+                    },
+                    controller: _regionController,
+                  ),
+                  TextFormCustom(
+                    label: 'Provincia',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese este campo';
+                      }
+                      return null;
+                    },
+                    controller: _provinciaController,
+                  ),
+                  TextFormCustom(
+                    label: 'Distrito',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese este campo';
+                      }
+                      return null;
+                    },
+                    controller: _distritoController,
+                  ),
+                  TextFormCustom(
+                    label: 'Dirección',
+                    keyboard: TextInputType.streetAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese este campo';
+                      }
+                      return null;
+                    },
+                    controller: _direccionController,
+                  ),
+                  const SizedBox(height: 20.0),
+                  Container(
+                    height: 40,
+                    margin: const EdgeInsets.symmetric(horizontal: 100),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          final client = Supabase.instance.client;
+                          await client.from('User').insert([
+                            {
+                              'id': _dniController.text,
+                              'name': _nombreController.text,
+                              'cellphone': _celularController.text,
+                              'email': _emailController.text,
+                              'region': _regionController.text,
+                              'province': _provinciaController.text,
+                              'district': _distritoController.text,
+                              'address': _direccionController.text,
+                            },
+                          ]);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => Formulario()),
+                              builder: (context) => const Formulario(),
+                            ),
                           );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(166, 134, 13, 108),
-                          elevation: 3,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 10),
-                        ),
-                        child: const Text(
-                          'Iniciar',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color.fromARGB(166, 134, 13, 108),
+                        elevation: 3,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 10),
+                      ),
+                      child: const Text(
+                        'Iniciar',
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }
 
 class TextFormCustom extends StatelessWidget {
-  String label;
-  TextInputType? keyboard = TextInputType.text;
-  TextFormCustom({super.key, required this.label, this.keyboard});
+  final String label;
+  final TextInputType? keyboard;
+  final FormFieldValidator<String>? validator;
+  final TextEditingController controller;
+
+  const TextFormCustom({
+    Key? key,
+    required this.label,
+    this.keyboard,
+    this.validator,
+    required this.controller,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
+        controller: controller,
         keyboardType: keyboard,
         decoration: InputDecoration(
           labelText: label,
@@ -115,6 +227,7 @@ class TextFormCustom extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
+        validator: validator,
       ),
     );
   }

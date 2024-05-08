@@ -39,6 +39,8 @@ dependencies:
   dotted_border: ^2.1.0
   flutter_radar_chart: ^0.2.1
   kg_charts: ^0.0.5
+  supabase_flutter: ^2.5.2
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

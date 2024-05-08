@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:ict/registro.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  await Supabase.initialize(
+    url: 'https://ebyieyonfghqlwrrbtqh.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVieWlleW9uZmdocWx3cnJidHFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTUwOTc3NzIsImV4cCI6MjAzMDY3Mzc3Mn0.znNSlSFgAUrFxDcr_CSu_d4zfIW8KSKFvpjt011XcAA',
+  );
   runApp(const MyApp());
 }
 
