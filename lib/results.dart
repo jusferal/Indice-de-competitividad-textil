@@ -8,6 +8,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class Results extends StatefulWidget {
+  final String id;
+  final String name;
+
+  const Results({super.key, required this.id, required this.name});
   @override
   State<Results> createState() => _ResultsState();
 }
@@ -41,9 +45,13 @@ class _ResultsState extends State<Results> {
   Future<void> fetchData() async {
     // La función fetchData es async
     final client = Supabase.instance.client;
-    final response = await client.from('Respuestas').select();
+    final response =
+        await client.from('Respuestas').select().eq('user', widget.id);
     puntajeTotal = 0;
+    print('el id es: ${widget.id}');
+    print(response);
     for (var pregunta in response) {
+      print(pregunta);
       puntajeTotal = puntajeTotal! + (pregunta['score'] as int);
       for (var i = 0; i < Dimensiones.length; i++) {
         if (Dimensiones[i] == pregunta['variable']) {
@@ -78,6 +86,16 @@ class _ResultsState extends State<Results> {
             child: Container(
               child: Column(
                 children: [
+                   Padding(
+                     padding: const EdgeInsets.symmetric(vertical: 12),
+                     child: Text(
+                      widget.name,
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                                       ),
+                   ),
                   puntajeTotal == null
                       ? CircularProgressIndicator()
                       : DonaConValorCentral(puntaje: puntajeTotal!),
@@ -176,8 +194,8 @@ class _ResultsState extends State<Results> {
                   puntajeTotal == null
                       ? CircularProgressIndicator()
                       : Table(
-                    puntajeDimension: puntajeDimension,
-                  ),
+                          puntajeDimension: puntajeDimension,
+                        ),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 20),
                     child: ElevatedButton(

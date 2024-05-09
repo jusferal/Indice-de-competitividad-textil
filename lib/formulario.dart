@@ -6,7 +6,9 @@ import 'package:ict/newForm.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Formulario extends StatefulWidget {
-  const Formulario({super.key});
+  final String id;
+  final String name;
+  const Formulario({super.key, required this.id, required this.name});
 
   @override
   State<Formulario> createState() => _FormularioState();
@@ -89,25 +91,25 @@ class _FormularioState extends State<Formulario> {
               }
             }
           }
-          await supabase.from('Respuestas').insert({
+          /*await supabase.from('Respuestas').insert({
             'dimension': 'dimension 1',
             'variable': 'dimension 1',
             'category': 'dimension 1',
             'question': 'dimension 1',
             'response': 'dimension 1',
             'score': 4,
-          });
+          });*/
           print('organizacion: $_selectedOrganization');
           print('actividades $_Activities');
 
           Queue<Category> queue = Queue.from(selectedCategories);
           print('longitud de la cola antes de pasar a next: ${queue.length}');
 
-          
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NextForm(categories: queue),
+              builder: (context) =>
+                  NextForm(categories: queue, id: widget.id, name: widget.name),
             ),
           );
           print('Actividad seleccionada: $_selectedOrganization');

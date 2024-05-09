@@ -58,7 +58,7 @@ class _RegistroState extends State<Registro> {
                   ),
                   const SizedBox(height: 10.0),
                   TextFormCustom(
-                    label: 'Nombre/Razon Social',
+                    label: 'Nombre(Nombres y Apellidos)/Razon Social',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, ingrese este campo';
@@ -159,20 +159,25 @@ class _RegistroState extends State<Registro> {
                           final client = Supabase.instance.client;
                           await client.from('User').insert([
                             {
-                              'id': _dniController.text,
                               'name': _nombreController.text,
                               'cellphone': _celularController.text,
                               'email': _emailController.text,
                               'region': _regionController.text,
                               'province': _provinciaController.text,
                               'district': _distritoController.text,
-                              'address': _direccionController.text,
+                              'numDocument': _dniController.text,
                             },
                           ]);
+                          final data = await client
+                              .from('User')
+                              .select()
+                              .eq('numDocument', _dniController.text);
+                          print(data);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Formulario(),
+                              builder: (context) => Formulario(
+                                  id: data[0]['id'], name: data[0]['name']),
                             ),
                           );
                         }
