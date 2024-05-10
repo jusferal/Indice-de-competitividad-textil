@@ -33,7 +33,7 @@ class _NextFormState extends State<NextForm> {
     widget.categories.forEach((elemento) {
       print(elemento.name);
     });
-    category = widget.categories.removeLast();
+    category = widget.categories.removeFirst();
     for (var i = 0; i < category.questions.length; i++) {
       bool ok = false;
       for (var option in category.questions[i].options) {

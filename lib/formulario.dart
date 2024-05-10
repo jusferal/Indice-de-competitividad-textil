@@ -91,6 +91,7 @@ class _FormularioState extends State<Formulario> {
               }
             }
           }
+
           /*await supabase.from('Respuestas').insert({
             'dimension': 'dimension 1',
             'variable': 'dimension 1',
@@ -103,6 +104,19 @@ class _FormularioState extends State<Formulario> {
           print('actividades $_Activities');
 
           Queue<Category> queue = Queue.from(selectedCategories);
+         /* for (Category category in categories_data) {
+            if (category.name == 'Gestión de Acabados Textiles' ||
+                category.name == 'Gestión de la Comercialización' ||
+                category.name == 'Gestión de Finanzas' ||
+                category.name == 'Gestión de la Tributación' ||
+                category.name == 'Educación' ||
+                category.name == 'Transporte' ||
+                category.name == 'Telecomunicaciones' ||
+                category.name == 'Salud' ||
+                category.name == 'Agua y Saneamiento') {
+              queue.addLast(category);
+            }
+          }*/
           print('longitud de la cola antes de pasar a next: ${queue.length}');
 
           Navigator.push(
