@@ -45,15 +45,15 @@ List<Category> categories_data = [
           '¿La asociación cuánto tiempo lleva inscrito en Registros Públicos (SUNARP)?',
           [
             Option('1 - 6 meses', 1),
-            Option('7 - 12 meses', 3),
-            Option('1 - 5 años', 6),
-            Option('6 - 10 años', 9),
+            Option('7 - 12 meses', 2),
+            Option('1 - 5 años', 3),
+            Option('6 - 10 años', 4),
             Option('Desconozco', 0),
           ],
           0,
           false,
           1,
-          9),
+          4),
       Question(
           '¿La asociación cuenta con el Registro Único del Contribuyente (RUC)?',
           [
@@ -68,12 +68,12 @@ List<Category> categories_data = [
           '¿Cuál es la situación actual del RUC de la asociación?',
           [
             Option('Activo y Habido', 1),
-            Option('Suspendido y Habido', 3),
+            Option('Suspendido y Habido', 2),
           ],
           0,
           false,
           1,
-          3),
+          2),
       Question(
           '¿La asociación cuenta con Estatuto actualizado?',
           [
@@ -117,25 +117,25 @@ List<Category> categories_data = [
       Question(
           '¿Cuál es el CIIU principal de la Asociación?',
           [
-            Option('', 3),
+            Option('', 1),
           ],
           2,
           false,
           1,
-          3),
+          1),
       Question(
           '¿Cuál es el Régimen tributario al que pertenece?',
           [
             Option('Nuevo Régime Único Simplificado (NRUS)', 1),
-            Option('Régimen Especial de Impuesto a la Renta (RER)', 3),
-            Option('Régimen MYPE Tributario (RMT)', 6),
-            Option('Régimen General', 9),
+            Option('Régimen Especial de Impuesto a la Renta (RER)', 2),
+            Option('Régimen MYPE Tributario (RMT)', 3),
+            Option('Régimen General', 4),
             Option('Ninguno', 0),
           ],
           0,
           true,
           0,
-          9),
+          4),
     ],
   ),
   Category(
@@ -156,30 +156,30 @@ List<Category> categories_data = [
       Question(
           '¿Qué información se encuentra en su estatuto?',
           [
-            Option('Denominación de la sociedad', 3),
-            Option('Objeto social', 3),
-            Option('Domicilio fiscal', 3),
-            Option('Duración y ámbito de actuación', 3),
-            Option('Capital mínimo aportado ', 3),
-            Option('Todas las anteriores', 9),
+            Option('Denominación de la sociedad', 1),
+            Option('Objeto social', 1),
+            Option('Domicilio fiscal', 1),
+            Option('Duración y ámbito de actuación', 1),
+            Option('Capital mínimo aportado ', 1),
+            Option('Todas las anteriores', 3),
           ],
           1,
           true,
           0,
-          9),
+          3),
       Question(
           'Respecto a la estructura interna, cuenta con',
           [
-            Option('Asamblea general', 3),
-            Option('Consejo Rector', 3),
-            Option('Intervención ', 3),
-            Option('Comité de Recursos', 3),
-            Option('Todas las anteriores', 9),
+            Option('Asamblea general', 1),
+            Option('Consejo Rector', 1),
+            Option('Intervención ', 1),
+            Option('Comité de Recursos', 1),
+            Option('Todas las anteriores', 3),
           ],
           1,
           true,
           0,
-          9),
+          3),
       Question(
           '¿Cuenta con un organigrama de gestión?',
           [
@@ -294,12 +294,12 @@ List<Category> categories_data = [
       Question(
           'Si la respuesta es "Sí". Mencione su Misión',
           [
-            Option('-', 3),
+            Option('-', 1),
           ],
           2,
           false,
           1,
-          3),
+          1),
       Question(
           '¿Su organización cuenta con una proyección a futuro (Visión)?',
           [
@@ -313,12 +313,12 @@ List<Category> categories_data = [
       Question(
           'Si la respuesta es "Sí". Mencione su Visión',
           [
-            Option('-', 3),
+            Option('-', 1),
           ],
           2,
           false,
           1,
-          3),
+          1),
       Question(
           '¿La organización cuenta con valores clave?',
           [
@@ -332,12 +332,12 @@ List<Category> categories_data = [
       Question(
           'Si la respuesta es "Sí". Mencione sus valores clave',
           [
-            Option('-', 3),
+            Option('-', 1),
           ],
           2,
           false,
           1,
-          3),
+          1),
       Question(
           '¿La organización cuenta con objetivos estratégicos?',
           [
@@ -351,12 +351,12 @@ List<Category> categories_data = [
       Question(
           'Si la respuesta es "Sí". Mencione sus objetivos estratégicos',
           [
-            Option('-', 3),
+            Option('-', 1),
           ],
           2,
           false,
           1,
-          3),
+          1),
     ],
   ),
   Category(
@@ -582,14 +582,14 @@ List<Category> categories_data = [
           '¿Cuántos años lleva usted o su organización en el rubro de la artesanía textil?',
           [
             Option('Menos de 1 año', 1),
-            Option('1 - 3 años', 3),
-            Option('3 - 5 años', 6),
-            Option('Más de 5 años', 9),
+            Option('1 - 3 años', 2),
+            Option('3 - 5 años', 3),
+            Option('Más de 5 años', 4),
           ],
           0,
           true,
           0,
-          9),
+          4),
       Question(
           '¿Qué tipo de productos artesanales produce?',
           [
@@ -670,7 +670,7 @@ List<Category> categories_data = [
           [
             Option('Crochet', 1),
             Option('Palitos de tejer', 1),
-            Option('Máquina de tejido rectilíneo', 3),
+            Option('Máquina de tejido rectilíneo', 2),
             Option('Máquina de tejido rectilineo industrial (Shima)', 3),
             Option('4 Estacas', 1),
             Option('Telar', 1),
@@ -685,14 +685,14 @@ List<Category> categories_data = [
         [
           Option('Palito y/o crochet', 1),
           Option('Máquina de tejer', 1),
-          Option('Remalladora de plato', 3),
-          Option('Moldes', 3),
-          Option('Todas las anteriores', 6),
+          Option('Remalladora de plato', 2),
+          Option('Moldes', 2),
+          Option('Todas las anteriores', 3),
         ],
         1,
         true,
         0,
-        6,
+        3,
       ),
       Question(
         '¿Realiza el uso de la tabla de medidas para el desarrollo de sus productos textiles?',
@@ -720,12 +720,12 @@ List<Category> categories_data = [
         '¿Cuál es el nivel de conocimiento que tiene de la ficha tecnica para elaborar sus productos textiles?',
         [
           Option('Solo interpreta la ficha técnica', 1),
-          Option('Interpreta y elabora una ficha técnica', 3),
+          Option('Interpreta y elabora una ficha técnica', 2),
         ],
         0,
         true,
         0,
-        3,
+        2,
       ),
       Question(
         '¿Realiza el patronaje para el desarrollo de sus productos textiles?',
@@ -765,51 +765,51 @@ List<Category> categories_data = [
         '¿De qué manera desarrolla el diseño de sus productos textiles?',
         [
           Option('Empírica influenciado por el entorno en el que vive', 1),
-          Option('Si recibio una capacitación', 3),
+          Option('Si recibio una capacitación', 2),
         ],
         0,
         true,
         0,
-        3,
+        2,
       ),
       Question(
         '¿Qué tipo de estudio utiliza para el desarrollo de sus productos textiles?',
         [
-          Option('Estudio de mercado', 3),
-          Option('Revision de fuentes de tendencia', 6),
+          Option('Estudio de mercado', 2),
+          Option('Revision de fuentes de tendencia', 3),
           Option('Replica de otros productos de la zona', 1),
         ],
         1,
         true,
         0,
-        6,
+        3,
       ),
       Question(
         '¿Qué tan importante considera a la incorporación de Moda y nuevas tendencias en la elaboración de sus productos textiles?',
         [
           Option('1: Nada importante', 0),
-          Option('2: Poco importante', 3),
-          Option('3: Muy importante', 6),
+          Option('2: Poco importante', 1),
+          Option('3: Muy importante', 2),
         ],
         0,
         true,
         0,
-        6,
+        2,
       ),
       Question(
         '¿Qué procesos de acabado de las prendas textiles realiza a nivel producción?',
         [
           Option('Lavado del hilado antes del desarrollo el producto', 1),
-          Option('Desarrollo de una muestra antes de iniciar el tejido', 3),
-          Option('Vaporiza de las prendas al finalizar su elaboración', 6),
+          Option('Desarrollo de una muestra antes de iniciar el tejido', 2),
+          Option('Vaporiza de las prendas al finalizar su elaboración', 2),
           Option(
-              'Ocultado de hilados al finalizar el armado de su producto', 9),
-          Option('Todas las anteriores', 9),
+              'Ocultado de hilados al finalizar el armado de su producto', 2),
+          Option('Todas las anteriores', 3),
         ],
         1,
         true,
         0,
-        9,
+        3,
       ),
       Question(
         '¿Qué Máquina de tejer Galga utiliza para elaborar su productos textiles?',
@@ -841,8 +841,8 @@ List<Category> categories_data = [
         '¿Cuál es el nivel de conocimiento que tiene de la operatividad de la máquina de tejer?',
         [
           Option('Básico', 1),
-          Option('Intermedio', 3),
-          Option('Avanzado', 6),
+          Option('Intermedio', 2),
+          Option('Avanzado', 3),
         ],
         0,
         true,
@@ -876,14 +876,14 @@ List<Category> categories_data = [
       Question(
         '¿Con qué frecuencia realiza la interpretación de las fichas técnicas?',
         [
-          Option('Siempre', 6),
-          Option('A veces', 3),
+          Option('Siempre', 2),
+          Option('A veces', 1),
           Option('Nunca', 0),
         ],
         0,
         false,
         1,
-        6,
+        2,
       ),
       Question(
         'Utiliza la tabla de tallas y medidas',
@@ -901,29 +901,29 @@ List<Category> categories_data = [
         [
           Option('Conozco pero no la utilizo', 0),
           Option('La utilice una vez', 1),
-          Option('A veces la utilizo', 3),
-          Option('Lo utilizo cuando tengo pedidos', 3),
-          Option('Siempre la utilizo', 6),
+          Option('A veces la utilizo', 2),
+          Option('Lo utilizo cuando tengo pedidos', 2),
+          Option('Siempre la utilizo', 3),
         ],
         0,
         false,
         1,
-        6,
+        3,
       ),
       Question(
         'En la determinación de puntos y carreras. ¿Qué pasos desarrolla?',
         [
-          Option('Muestra de tensión', 3),
-          Option('Muestra de orientación', 3),
-          Option('Fórmula de conversión', 3),
-          Option('Desarrollo de hojas de trabajo', 3),
+          Option('Muestra de tensión', 1),
+          Option('Muestra de orientación', 1),
+          Option('Fórmula de conversión', 1),
+          Option('Desarrollo de hojas de trabajo', 1),
           Option('Ninguna', 0),
-          Option('Todas las anteriores', 6),
+          Option('Todas las anteriores', 2),
         ],
         1,
         true,
         0,
-        6,
+        2,
       ),
       Question(
         '¿Qué técnicas de tejido utiliza para el desarrollo de sus productos textiles?',
@@ -939,15 +939,15 @@ List<Category> categories_data = [
         1,
         true,
         0,
-        6,
+        1,
       ),
       Question(
         '¿Qué tipo(s) de control de calidad lleva a cabo?',
         [
-          Option('Control de calidad en los materiales', 3),
+          Option('Control de calidad en los materiales', 1),
           Option(
-              'Control de calidad en el proceso de tejido de las prendas', 3),
-          Option('Control de calidad al final de los acabados', 3),
+              'Control de calidad en el proceso de tejido de las prendas', 1),
+          Option('Control de calidad al final de los acabados', 1),
         ],
         1,
         true,
@@ -1022,14 +1022,14 @@ List<Category> categories_data = [
       Question(
           '¿Qué productos desarrollan utilizando la técnica de peletería?',
           [
-            Option('Chalinas y bufandas', 0),
-            Option('Tapices y alfombras', 0),
-            Option('Bolsos y carteras', 0),
+            Option('Chalinas y bufandas', 1),
+            Option('Tapices y alfombras', 1),
+            Option('Bolsos y carteras', 1),
           ],
-          0,
+          1,
           true,
           0,
-          0),
+          3),
     ],
   ),
   Category(
@@ -1167,7 +1167,7 @@ List<Category> categories_data = [
           0,
           false,
           1,
-          1),
+          2),
       Question(
           '¿Qué tipo de secado realiza?',
           [
@@ -1206,8 +1206,8 @@ List<Category> categories_data = [
             Option('Teñidos natural (Uso de plantas, flores y raíces)', 0),
           ],
           1,
-          true,
-          2,
+          false,
+          1,
           0),
     ],
   ),
@@ -1416,25 +1416,25 @@ List<Category> categories_data = [
       Question(
           '¿Su propuesta de valor esta enfocada en?',
           [
-            Option('El producto', 0),
-            Option('El proceso productivo', 0),
-            Option('En la comeracialización', 0),
+            Option('El producto', 1),
+            Option('El proceso productivo', 1),
+            Option('En la comeracialización', 1),
           ],
-          0,
+          1,
           true,
           0,
-          0),
+          3),
       Question(
           '¿Qué tipo de modelo comercial maneja su empresa?',
           [
-            Option('B2B (Empresa a Empresa)', 0),
-            Option('B2C (Empresa a Consumidor)', 0),
-            Option('B2G (Empresa a Gobierno)', 0),
+            Option('B2B (Empresa a Empresa)', 1),
+            Option('B2C (Empresa a Consumidor)', 1),
+            Option('B2G (Empresa a Gobierno)', 1),
           ],
-          0,
+          1,
           true,
           0,
-          0),
+          3),
       Question(
           '¿Realiza el uso de alguna herramienta para gestionar las finanzas de su negocio? (registro de gastos e ingresos)',
           [
@@ -2664,9 +2664,9 @@ List<Category> categories_data = [
             Option('Máquina industrial (Máquinas de tejer industriales)', 0),
           ],
           1,
-          false,
-          1,
-          3),
+          true,
+          0,
+          0),
       Question(
           '¿Cómo utiliza la tecnología en el proceso de producción de textiles?',
           [

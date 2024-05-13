@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:ict/model/indice.dart';
 import 'package:ict/results.dart';
@@ -52,13 +54,13 @@ class _NextFormState extends State<NextForm> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
+      child: Scaffold(                
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(166, 134, 13, 108),
           automaticallyImplyLeading: false,
           title: Center(
             child: Text(
-              category.name,
+              category.variable,
               style: const TextStyle(
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold,
@@ -66,30 +68,45 @@ class _NextFormState extends State<NextForm> {
             ),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: ListView.builder(
-            itemCount: category.questions.length,
-            itemBuilder: (context, index) {
-              final question = category.questions[index];
-              switch (question.typeWidget) {
-                case 0:
-                  return Visibility(
-                      visible: question.isVisible,
-                      child: buildRadioListTile(question, index));
-                case 1:
-                  return Visibility(
-                      visible: question.isVisible,
-                      child: buildCheckboxListTile(question, index));
-                case 2:
-                  return Visibility(
-                      visible: question.isVisible,
-                      child: buildTextFormField(question, index));
-                default:
-                  return const SizedBox();
-              }
-            },
-          ),
+        body: Column(
+          children: [
+            (category.name != category.variable)?Center(
+              child: Text(
+                category.name,
+                style: const TextStyle(
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ):Center(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: ListView.builder(
+                  itemCount: category.questions.length,
+                  itemBuilder: (context, index) {
+                    final question = category.questions[index];
+                    switch (question.typeWidget) {
+                      case 0:
+                        return Visibility(
+                            visible: question.isVisible,
+                            child: buildRadioListTile(question, index));
+                      case 1:
+                        return Visibility(
+                            visible: question.isVisible,
+                            child: buildCheckboxListTile(question, index));
+                      case 2:
+                        return Visibility(
+                            visible: question.isVisible,
+                            child: buildTextFormField(question, index));
+                      default:
+                        return const SizedBox();
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
@@ -105,6 +122,7 @@ class _NextFormState extends State<NextForm> {
                   } else {
                     options = answers[i]?['response'];
                   }
+                  print(options);
                   for (final option in options) {
                     if (option == category.name &&
                         (category.name == 'Prendas Tejidas a Punto' ||
@@ -112,7 +130,12 @@ class _NextFormState extends State<NextForm> {
                             category.name == 'Tejido plano en Telar' ||
                             category.name == 'Prendas' ||
                             category.name == 'Accesorios' ||
-                            category.name == 'DecoHome')) {
+                            category.name == 'DecoHome' ||
+                            category.name == 'Teñido industrial' ||
+                            category.name ==
+                                'Teñido artesanal (Plantas y químicos)' ||
+                            category.name ==
+                                'Teñidos natural (Uso de plantas, flores y raíces)')) {
                       setState(() {
                         widget.categories.addFirst(category);
                       });
@@ -225,6 +248,7 @@ class _NextFormState extends State<NextForm> {
                       'question': question.text,
                       'response': value,
                       'score': option.score,
+                      'maxScore': question.totalScore,
                     };
                     if (value == 'Si') {
                       if (index < category.questions.length - 1 &&
@@ -252,7 +276,10 @@ class _NextFormState extends State<NextForm> {
   Widget buildCheckboxListTile(Question question, int index) {
     // Define un controlador para el campo de texto personalizado
     TextEditingController customInputController = TextEditingController();
-    String content = textEditingControllerMap[index]?.text ?? '';
+    String content = textEditingControllerMap[index] != null
+        ? textEditingControllerMap[index]!.text
+        : '';
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
       child: Column(
@@ -305,7 +332,8 @@ class _NextFormState extends State<NextForm> {
                                   'category': category.name,
                                   'question': question.text,
                                   'response': selectedOptions,
-                                  'score': totalScore,
+                                  'score': min(totalScore, question.totalScore),
+                                  'maxScore': question.totalScore,
                                   // Puedes calcular el puntaje aquí según las opciones seleccionadas
                                 };
                               }
@@ -352,7 +380,9 @@ class _NextFormState extends State<NextForm> {
                                     'category': category.name,
                                     'question': question.text,
                                     'response': selectedOptions,
-                                    'score': totalScore,
+                                    'score':
+                                        min(totalScore, question.totalScore),
+                                        'maxScore': question.totalScore,
                                     // Puedes calcular el puntaje aquí según las opciones seleccionadas
                                   };
                                 });
@@ -399,7 +429,8 @@ class _NextFormState extends State<NextForm> {
                           'category': category.name,
                           'question': question.text,
                           'response': selectedOptions,
-                          'score': totalScore,
+                          'score': min(totalScore, question.totalScore),
+                          'maxScore': question.totalScore,
                           // Puedes calcular el puntaje aquí según las opciones seleccionadas
                         };
                       }
@@ -445,6 +476,7 @@ class _NextFormState extends State<NextForm> {
                   'question': question.text,
                   'response': value,
                   'score': question.options[0].score,
+                  'maxScore': question.totalScore,
                 };
               });
             },

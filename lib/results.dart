@@ -22,7 +22,7 @@ class _ResultsState extends State<Results> {
     "Gestión Productiva Primaria",
     "Gestión de Diseño y Desarrollo de Productos",
     "Gestión de Acabados Textiles",
-    "Gestión de la Comerzializacion",
+    "Gestión de la Comercialización",
     "Gestión de Finanzas",
     "Gestión de la Tributación",
     "Educación",
@@ -31,11 +31,11 @@ class _ResultsState extends State<Results> {
     "Salud",
     "Agua y Saneamiento",
     "Gestión Ambiental",
-    "Tecnologiía  e Innovación",
+    "Tecnologia e Innovación",
     "Gestión Organizacional",
   ];
   List<int> puntajeDimension = List.filled(14, 0); // Rellena la lista con 0s
-
+List<int> puntajeDimensionMax = List.filled(14, 0); 
   @override
   void initState() {
     super.initState();
@@ -56,12 +56,16 @@ class _ResultsState extends State<Results> {
       for (var i = 0; i < Dimensiones.length; i++) {
         if (Dimensiones[i] == pregunta['variable']) {
           puntajeDimension[i] += (pregunta['score'] as int);
+          puntajeDimensionMax[i] += (pregunta['maxScore'] as int);
         }
       }
     }
     setState(() {});
     print(puntajeTotal);
     print(puntajeDimension);
+    print(puntajeDimensionMax);
+    print("es::::::::::::::");
+    print(puntajeDimension.map((e) => e.toDouble()).toList());
   }
 
   @override
@@ -86,16 +90,16 @@ class _ResultsState extends State<Results> {
             child: Container(
               child: Column(
                 children: [
-                   Padding(
-                     padding: const EdgeInsets.symmetric(vertical: 12),
-                     child: Text(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
                       widget.name,
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
-                                       ),
-                   ),
+                    ),
+                  ),
                   puntajeTotal == null
                       ? CircularProgressIndicator()
                       : DonaConValorCentral(puntaje: puntajeTotal!),
@@ -112,27 +116,27 @@ class _ResultsState extends State<Results> {
                           children: [
                             CircleWithText('1°',
                                 hasBorder:
-                                    (puntajeTotal! >= 0 && puntajeTotal! <= 20)
+                                    (puntajeTotal! >= 0 && puntajeTotal! <= 50)
                                         ? true
                                         : false),
                             CircleWithText('2°',
                                 hasBorder:
-                                    (puntajeTotal! >= 21 && puntajeTotal! <= 40)
+                                    (puntajeTotal! >= 51 && puntajeTotal! <= 100)
                                         ? true
                                         : false),
                             CircleWithText('3°',
                                 hasBorder:
-                                    (puntajeTotal! >= 41 && puntajeTotal! <= 60)
+                                    (puntajeTotal! >= 101 && puntajeTotal! <= 150)
                                         ? true
                                         : false),
                             CircleWithText('4°',
                                 hasBorder:
-                                    (puntajeTotal! >= 61 && puntajeTotal! <= 80)
+                                    (puntajeTotal! >= 151 && puntajeTotal! <= 200)
                                         ? true
                                         : false),
                             CircleWithText('5°',
-                                hasBorder: (puntajeTotal! >= 81 &&
-                                        puntajeTotal! <= 100)
+                                hasBorder: (puntajeTotal! >= 201 &&
+                                        puntajeTotal! <= 300)
                                     ? true
                                     : false),
                           ],
@@ -144,25 +148,26 @@ class _ResultsState extends State<Results> {
                         LegendModel('', const Color(0XFF0EBD8D)),
                       ],
                       indicator: [
-                        IndicatorModel("G. Productiva Primaria", 100),
+                        IndicatorModel("G. Productiva Primaria", 75),
                         IndicatorModel(
-                            "G. de Diseño y Desarrollo de Productos", 100),
-                        IndicatorModel("G. de Acabados Textiles", 100),
-                        IndicatorModel("G. de la Comerzializacion", 100),
-                        IndicatorModel("G. de Finanzas", 100),
-                        IndicatorModel("G. Tributación", 100),
-                        IndicatorModel("Educación", 100),
-                        IndicatorModel("Transporte", 100),
-                        IndicatorModel("Telecomunicaciones", 100),
-                        IndicatorModel("Salud", 100),
-                        IndicatorModel("Agua y Saneamiento", 100),
-                        IndicatorModel("G. Ambiental", 100),
-                        IndicatorModel("Tecnologiía  e Innovación", 100),
-                        IndicatorModel("G. Organizacional", 100),
+                            "G. de Diseño y Desarrollo de Productos", 53),
+                        IndicatorModel("G. de Acabados Textiles", 7),
+                        IndicatorModel("G. de la Comerzializacion", 73),
+                        IndicatorModel("G. de Finanzas", 8),
+                        IndicatorModel("G. Tributación", 12),
+                        IndicatorModel("Educación", 6),
+                        IndicatorModel("Transporte", 4 ),
+                        IndicatorModel("Telecomunicaciones", 9),
+                        IndicatorModel("Salud", 11),
+                        IndicatorModel("Agua y Saneamiento", 8),
+                        IndicatorModel("G. Ambiental", 26),
+                        IndicatorModel("Tecnologiía  e Innovación", 15),
+                        IndicatorModel("G. Organizacional", 17),
                       ],
                       data: [
                         //   MapDataModel([48,32.04,1.00,94.5,19,60,50,30,19,60,50]),
-                        //   MapDataModel([42.59,34.04,1.10,68,99,30,19,60,50,19,30]),
+                        //MapDataModel([42.59,34.04,1.10,68,74,30,19,60,50,19,30,50,19,30]),
+                         //MapDataModel([60.0, 8.0, 0.0, 60.0, 1.0, 4.0, 3.0, 2.0, 8.0, 7.0, 6.0, 7.0, 0.0, 4.0]),
                         MapDataModel(
                             puntajeDimension.map((e) => e.toDouble()).toList()),
                       ],
@@ -396,35 +401,35 @@ class _TableState extends State<Table> {
         'Fila ${i + 1}, Celda 4',
       ]);
     }
-    tableData[0][0] = "Gestión Productiva Primaria";
-    tableData[1][0] = "Gestión de Diseño y Desarrollo de Productos";
-    tableData[2][0] = "Gestión de Acabados Textiles";
-    tableData[3][0] = "Gestión de la Comerzializacion";
-    tableData[4][0] = "Gestión de Finanzas";
-    tableData[5][0] = "Gestión de la Tributación";
+    tableData[0][0] = "G. Productiva Primaria";
+    tableData[1][0] = "G. de Diseño y Desarrollo de Productos";
+    tableData[2][0] = "G. de Acabados Textiles";
+    tableData[3][0] = "G. de la Comerzializacion";
+    tableData[4][0] = "G. de Finanzas";
+    tableData[5][0] = "G. de la Tributación";
     tableData[6][0] = "Educación";
     tableData[7][0] = "Transporte";
     tableData[8][0] = "Telecomunicaciones";
     tableData[9][0] = "Salud";
     tableData[10][0] = "Agua y Saneamiento";
-    tableData[11][0] = "Gestión Ambiental";
-    tableData[12][0] = "Tecnologiía  e Innovación";
-    tableData[13][0] = "Gestión Organizacional";
+    tableData[11][0] = "G. Ambiental";
+    tableData[12][0] = "Tecnologiía e Innovación";
+    tableData[13][0] = "G. Organizacional";
 
-    tableData[0][1] = "90";
-    tableData[1][1] = "171";
-    tableData[2][1] = "111";
-    tableData[3][1] = "50";
-    tableData[4][1] = "50";
-    tableData[5][1] = "50";
-    tableData[6][1] = "50";
-    tableData[7][1] = "50";
-    tableData[8][1] = "50";
-    tableData[9][1] = "50";
-    tableData[10][1] = "50";
-    tableData[11][1] = "50";
-    tableData[12][1] = "50";
-    tableData[13][1] = "150";
+    tableData[0][1] = "68";
+    tableData[1][1] = "53";
+    tableData[2][1] = "7";
+    tableData[3][1] = "73";
+    tableData[4][1] = "8";
+    tableData[5][1] = "12";
+    tableData[6][1] = "6";
+    tableData[7][1] = "4";
+    tableData[8][1] = "9";
+    tableData[9][1] = "11";
+    tableData[10][1] = "8";
+    tableData[11][1] = "26";
+    tableData[12][1] = "15";
+    tableData[13][1] = "17";
     print("tablaassasdasdasdas");
     print(widget.puntajeDimension);
     for (int i = 0; i < 14; i++) {

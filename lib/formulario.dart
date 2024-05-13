@@ -104,7 +104,7 @@ class _FormularioState extends State<Formulario> {
           print('actividades $_Activities');
 
           Queue<Category> queue = Queue.from(selectedCategories);
-         /* for (Category category in categories_data) {
+          for (Category category in categories_data) {
             if (category.name == 'Gestión de Acabados Textiles' ||
                 category.name == 'Gestión de la Comercialización' ||
                 category.name == 'Gestión de Finanzas' ||
@@ -113,10 +113,18 @@ class _FormularioState extends State<Formulario> {
                 category.name == 'Transporte' ||
                 category.name == 'Telecomunicaciones' ||
                 category.name == 'Salud' ||
-                category.name == 'Agua y Saneamiento') {
+                category.name == 'Agua y Saneamiento' ||
+                category.name == 'Tecnologia e Innovación' ||
+                (_selectedOrganization == 'Emprendedor' &&
+                    category.name == 'G. Ambiental Emprendedor') ||
+                ((_selectedOrganization == 'Asociación' ||
+                        _selectedOrganization == 'Cooperativa') &&
+                    category.name == 'G. Ambiental Asociacion/Cooperativa') ||
+                (_selectedOrganization == 'Empresa ' &&
+                    category.name == 'G. Ambiental Empresa')) {
               queue.addLast(category);
             }
-          }*/
+          }
           print('longitud de la cola antes de pasar a next: ${queue.length}');
 
           Navigator.push(
