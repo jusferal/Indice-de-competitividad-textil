@@ -1681,10 +1681,185 @@ List<Category> categories_data = [
             Option('Otros (especificar)', 1),
             Option('Ninguna', 0),
           ],
-          2,
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Cómo gestiona la relación  con sus clientes habituales?',
+          [
+            Option(
+                'Mantengo una comunicación regular a través de boletines informativos o correos electrónicos',
+                1),
+            Option('Ofrezco descuentos especiales y promociones exclusivas', 1),
+            Option('Utilizo programas de fidelización de clientes', 1),
+            Option(
+                'No tengo estrategias específicas para gestionar la relación con los clientes',
+                1),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Conoce qué es un plan de Marketing?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          true,
+          0,
+          1),
+      Question(
+          '¿Cuenta con un Plan de Marketing?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
           false,
           1,
-          0),
+          1),
+      Question(
+          '¿Que tipo de plan de marketing utiliza?',
+          [
+            Option('Tradicional', 1),
+            Option('Digital', 2),
+          ],
+          0,
+          true,
+          0,
+          2),
+      Question(
+          '¿Qué tipo de herramienta de Marketing utiliza?',
+          [
+            Option('CRM', 2),
+            Option('Gestor de contenido', 2),
+            Option('Inteligencia Artificial', 2),
+            Option('Mailing o correos electrónicos', 2),
+            Option('Administrador de anuncios', 2),
+            Option('Otro (Especifique)', 1),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Qué formatos de Marketing digital utiliza?',
+          [
+            Option('Redes sociales (Facebook)', 1),
+            Option(
+                'Plataformas virtuales (tiendas virtuales, marketplaces)', 2),
+            Option(
+                'Marketing de contenidos (videos, fotografia de productos, blogs, etc)',
+                3),
+            Option('Marketing con influencers', 3),
+            Option('Paginas web', 2),
+            Option('Otro (Especifique)', 1),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Qué tipo de publicidad utiliza?',
+          [
+            Option('Online (Digital)', 2),
+            Option('Tradicional (Períodicos, la radio, TV)', 1),
+          ],
+          0,
+          true,
+          0,
+          2),
+      Question(
+          '¿Cuál es la frecuencia de publicación online?',
+          [
+            Option('Diario', 3),
+            Option('Semanal', 2),
+            Option('Mensual', 1),
+            Option('No realiza', 0),
+          ],
+          0,
+          true,
+          0,
+          3),
+      Question(
+          '¿Cuál es el Alcance de ventas (mercados) tiene su negocio?',
+          [
+            Option('Local', 1),
+            Option('Nacional', 2),
+            Option('Internacional', 3),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          'Utiliza medios o plataformas de pago',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          true,
+          0,
+          1),
+      Question(
+          '¿Cuáles son las plataforma de pago que utiliza?',
+          [
+            Option('Billeteras virtuales', 1),
+            Option('Pasarela de pagos', 1),
+            Option('Otro (Especifique)', 1),
+          ],
+          1,
+          false,
+          1,
+          3),
+      Question(
+          '¿Qué tipo de Billeteras virtuales utiliza?',
+          [
+            Option('Yape', 1),
+            Option('Plin', 1),
+            Option('Wayki', 1),
+          ],
+          1,
+          true,
+          0,
+          1),
+      Question(
+          'Cuenta con pasarela de pagos',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          true,
+          0,
+          1),
+      Question(
+          '¿Qué tipo de pasarela de pago utiliza?',
+          [
+            Option('Paypal', 1),
+            Option('Mercado pago', 1),
+            Option('Culqi', 1),
+            Option('Izypay', 1),
+            Option('Niubiz', 1),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Cuenta con una tienda virtual (tienda virtual de ventas)?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          true,
+          0,
+          1),
     ],
   ),
   Category(
@@ -2234,11 +2409,12 @@ List<Category> categories_data = [
           true,
           0,
           2),
-          Question(
+      Question(
           'En tu proceso de producción textil, ¿Qué técnicas ancestrales utilizas para reducir el impacto ambiental?',
           [
             Option('Pastoreo rotativo para preservar la vegetación natural', 1),
-            Option('Teñido natural con plantas y minerales locales/ de la zona', 1),
+            Option('Teñido natural con plantas y minerales locales/ de la zona',
+                1),
             Option('Uso de técnicas de tejido tradicional (Away, telar)', 1),
             Option('Otros (especificar)', 1),
             Option('No utilizo ninguna técnica ancestral', 0),
@@ -2273,8 +2449,7 @@ List<Category> categories_data = [
           'En tu empresa utilizas estrategias de sensibilización para sus clientes acerca de la importancia de la sostenibilidad ambiental?',
           [
             Option('Si', 1),
-            Option('No',
-                1),
+            Option('No', 1),
           ],
           0,
           true,
@@ -2283,9 +2458,9 @@ List<Category> categories_data = [
       Question(
           '¿Qué prácticas realiza su asociación para cuidar el medio ambiente?',
           [
-            Option(
-                'a) Separamos los residuos sólidos para su reciclaje.', 1),
-            Option('b) Reutilizamos materiales en la fabricación de productos.', 1),
+            Option('a) Separamos los residuos sólidos para su reciclaje.', 1),
+            Option('b) Reutilizamos materiales en la fabricación de productos.',
+                1),
             Option('c) Reducimos el consumo de agua y energía.', 1),
             Option('d) Ninguna de las anteriores.', 0),
           ],
@@ -2296,7 +2471,8 @@ List<Category> categories_data = [
       Question(
           '¿Su Asociación u Cooperativa cuenta con un sistema de recolección de residuos sólidos?',
           [
-            Option('a) Sí, contamos con un servicio regular de recolección.', 0),
+            Option(
+                'a) Sí, contamos con un servicio regular de recolección.', 0),
             Option('b) A veces, el servicio de recolección es irregular.', 0),
             Option('c) No, no tenemos servicio de recolección de residuos.', 0),
             Option('No realizo ninguna acción', 0),
@@ -2305,7 +2481,7 @@ List<Category> categories_data = [
           true,
           0,
           0),
-          Question(
+      Question(
           '¿Qué acciones específicas se toman en su Asociación y/o Cooperativa para reducir el impacto ambiental en su proceso de producción textil?',
           [
             Option('Uso de tintes naturales y orgánicos', 0),
@@ -2317,11 +2493,12 @@ List<Category> categories_data = [
           true,
           0,
           0),
-          Question(
+      Question(
           'En su proceso de producción textil, ¿Qué técnicas ancestrales utilizan para reducir el impacto ambiental?',
           [
             Option('Re uso de mermas', 0),
-            Option('Teñido natural con plantas y minerales locales de la zona', 0),
+            Option(
+                'Teñido natural con plantas y minerales locales de la zona', 0),
             Option('Uso de técnicas de tejido tradicional (Away, telar)', 0),
             Option('Otros (especificar)', 0),
           ],
@@ -2329,12 +2506,18 @@ List<Category> categories_data = [
           true,
           0,
           0),
-           Question(
+      Question(
           '¿Qué estrategias aplica para sensibilizar a tu comunidad y clientes sobre la importancia de la gestión ambiental en la producción textil?',
           [
-            Option('Organización de talleres y eventos educativos sobre prácticas sostenibles', 0),
-            Option('Creación de campañas de sensibilización en redes sociales y medios locales', 0),
-            Option('Inclusión de información sobre la sostenibilidad en el etiquetado y marketing de sus productos textiles', 0),
+            Option(
+                'Organización de talleres y eventos educativos sobre prácticas sostenibles',
+                0),
+            Option(
+                'Creación de campañas de sensibilización en redes sociales y medios locales',
+                0),
+            Option(
+                'Inclusión de información sobre la sostenibilidad en el etiquetado y marketing de sus productos textiles',
+                0),
             Option('Ninguna estrategia', 0),
           ],
           0,
@@ -2367,71 +2550,184 @@ List<Category> categories_data = [
           'En tu empresa utilizas estrategias de sensibilización para sus clientes acerca de la importancia de la sostenibilidad ambiental?',
           [
             Option('Si', 1),
-            Option('No',
-                1),
+            Option('No', 1),
           ],
           0,
           true,
           0,
           1),
       Question(
-          '¿Qué prácticas realiza su asociación para cuidar el medio ambiente?',
+          '¿Qué estrategías utiliza para sensibilizar a sus clientes sobre la importancia de la sostenibilidad ambiental en la industria textil?',
           [
             Option(
-                'a) Separamos los residuos sólidos para su reciclaje.', 1),
-            Option('b) Reutilizamos materiales en la fabricación de productos.', 1),
-            Option('c) Reducimos el consumo de agua y energía.', 1),
-            Option('d) Ninguna de las anteriores.', 0),
+                'Etiquetado y marketing que resalten las práxticas sostenibles de la empresa',
+                1),
+            Option(
+                'Organización de eventos educativos y charlas sobre el impacto ambiental de la industria textil',
+                1),
+            Option('Ofreciendo productos sostenibles', 1),
+            Option('Ninguna', 0),
           ],
-          0,
+          1,
           false,
           1,
-          2),
+          3),
       Question(
-          '¿Su Asociación u Cooperativa cuenta con un sistema de recolección de residuos sólidos?',
+          '¿Qué desafios enfrentan en la implementación de prácticas ambientales en sus negocios?',
           [
-            Option('a) Sí, contamos con un servicio regular de recolección.', 0),
-            Option('b) A veces, el servicio de recolección es irregular.', 0),
-            Option('c) No, no tenemos servicio de recolección de residuos.', 0),
-            Option('No realizo ninguna acción', 0),
-          ],
-          0,
-          true,
-          0,
-          0),
-          Question(
-          '¿Qué acciones específicas se toman en su Asociación y/o Cooperativa para reducir el impacto ambiental en su proceso de producción textil?',
-          [
-            Option('Uso de tintes naturales y orgánicos', 0),
-            Option('Reciclaje de materiales y residuos', 0),
-            Option('Reducción de consumo de agua y energía eléctrica', 0),
-            Option('No realizo ninguna acción', 0),
-          ],
-          1,
-          true,
-          0,
-          0),
-          Question(
-          'En su proceso de producción textil, ¿Qué técnicas ancestrales utilizan para reducir el impacto ambiental?',
-          [
-            Option('Re uso de mermas', 0),
-            Option('Teñido natural con plantas y minerales locales de la zona', 0),
-            Option('Uso de técnicas de tejido tradicional (Away, telar)', 0),
+            Option(
+                'Costos elevados asociados con la adopción de tecnologías sostenibles',
+                0),
+            Option('Escasez de recursos y acceso limitado a financiamiento', 0),
+            Option(
+                'Falta de capacitación y conocimiento sobre  practicas sostenibles',
+                0),
             Option('Otros (especificar)', 0),
           ],
           1,
           true,
           0,
           0),
-           Question(
-          '¿Qué estrategias aplica para sensibilizar a tu comunidad y clientes sobre la importancia de la gestión ambiental en la producción textil?',
+      Question(
+          '¿Qué medidas concretas ha implementado su Asociación/Cooperativa para reducir su impacto ambiental?',
           [
-            Option('Organización de talleres y eventos educativos sobre prácticas sostenibles', 0),
-            Option('Creación de campañas de sensibilización en redes sociales y medios locales', 0),
-            Option('Inclusión de información sobre la sostenibilidad en el etiquetado y marketing de sus productos textiles', 0),
-            Option('Ninguna estrategia', 0),
+            Option(
+                'a) Uso de materiales reciclables en nuestros productos.', 0),
+            Option(
+                'b) Reducción del consumo de agua y energía en procesos productivos.',
+                0),
+            Option(
+                'c) Implementación de tecnologías limpias para reducir emisiones',
+                0),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Qué desafíos enfrenta su empresa en términos de gestión ambiental y cuidado del medio ambiente?',
+          [
+            Option(
+                'a) Resistencia al cambio debido a la arraigada tradición cultural',
+                0),
+            Option('b) Falta de capacitación y conciencia ambiental', 0),
+            Option(
+                'c) Dificultades para acceder a tecnologías limpias y sostenibles.',
+                0),
+          ],
+          1,
+          true,
+          0,
+          0),
+    ],
+  ),
+  Category(
+    'Tecnologia e Innovación',
+    'Dimension Externa',
+    'Tecnologia e Innovación',
+    [
+      Question(
+          '¿Qué tipo de dispositivos electrónicos posee actualmente para su trabajo como artesano/a de camélidos?',
+          [
+            Option('a) No poseo dispositivos electrónicos.', 0),
+            Option('b) Celular básico (analógico).', 1),
+            Option('c) Celular inteligente (smartphone).', 2),
+            Option('d) Tablet u otro dispositivo electrónico.', 2),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Para qué utiliza principalmente su teléfono móvil?',
+          [
+            Option('a) Para comunicarse con clientes y proveedores.', 2),
+            Option(
+                'b) Para buscar información sobre técnicas de tejido y diseño.',
+                2),
+            Option(
+                'c) Para promocionar y vender sus productos en redes sociales.',
+                2),
+            Option('d) Lo utilizo con fines personales ', 1),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Qué tipo de tecnología utilizas en la producción de sus productos  textiles?',
+          [
+            Option('Maquinaria tradicional (Telar, away, palitos, etc.)', 0),
+            Option(
+                'Maquinaria semi industrial (Telar automático, máquinas de tejer, etc.)',
+                0),
+            Option('Máquina industrial (Máquinas de tejer industriales)', 0),
+          ],
+          1,
+          false,
+          1,
+          3),
+      Question(
+          '¿Cómo utiliza la tecnología en el proceso de producción de textiles?',
+          [
+            Option('a) No utiliza tecnología en el proceso de producción.', 0),
+            Option('b) Utiliza el celular para comunicaciones y pedidos.', 1),
+            Option(
+                'c) Utiliza tabletas para diseño y gestión de inventario.', 2),
+            Option(
+                'd) Utiliza herramientas tecnológicas avanzadas en todo el proceso.',
+                3),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Realiza el uso de algún tipo de tecnologías de diseño, sistemas de gestión de inventarios o aplicativo móvil?',
+          [
+            Option('Si.', 1),
+            Option('No', 0),
           ],
           0,
+          true,
+          0,
+          1),
+      Question(
+          '¿Qué tipo de tecnologías utiliza su empresa en la cadena de valor textil de camélidos?',
+          [
+            Option('a) Tecnologías de diseño y modelado 3D.', 2),
+            Option('b) Sistemas de gestión de inventarios y ventas.', 2),
+            Option(
+                'c) Aplicaciones móviles para seguimiento de procesos productivos.',
+                2),
+          ],
+          1,
+          false,
+          1,
+          2),
+      Question(
+          '¿Has implementado alguna innovación en tu negocio de prendas de alpaca en los últimos 2 años?',
+          [
+            Option('Sí, en el proceso de producción', 1),
+            Option('Sí, en el diseño de prendas', 1),
+            Option('Sí, en la comercialización y marketing', 1),
+            Option('No he implementado ninguna innovación', 0),
+          ],
+          1,
+          true,
+          0,
+          3),
+      Question(
+          '¿Cuáles consideras que son los principales obstaculos para implementar tecnología e innovación en tu negocio?',
+          [
+            Option('Falta de acceso a financiamiento para adquirir tecnologías',
+                0),
+            Option('Falta de conocimientos sobre nuevas tecnologías', 0),
+            Option('Resistencia al cambio', 0),
+            Option('Costo elevado de implementación', 0),
+            Option('Otros (especificar)', 0),
+          ],
+          1,
           true,
           0,
           0),

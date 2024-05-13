@@ -252,7 +252,7 @@ class _NextFormState extends State<NextForm> {
   Widget buildCheckboxListTile(Question question, int index) {
     // Define un controlador para el campo de texto personalizado
     TextEditingController customInputController = TextEditingController();
-    String content =textEditingControllerMap[index]!.text;
+    String content = textEditingControllerMap[index]?.text ?? '';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
       child: Column(
