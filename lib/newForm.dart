@@ -118,7 +118,7 @@ class _NextFormState extends State<NextForm> {
               print('comenzand');
               int newCode = 0;
               for (var i = 0; i < category.questions.length; i++) {
-                if (category.questions[i].behavior != 2) continue;
+                if (category.questions[i].behavior != 2 &&category.questions[i].behavior != 3) continue;
                 for (Category category in categories_data) {
                   print(answers[i]?['response']);
                   final options;
