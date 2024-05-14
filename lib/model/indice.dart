@@ -1887,9 +1887,79 @@ List<Category> categories_data = [
             Option('Otro (Especifique)', 0),
           ],
           1,
+          false,
+          1,
+          0),
+      Question(
+          '¿Conoce que es un Fondo Concursable No Reembolsable?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
           true,
           0,
-          0),
+          1),
+      Question(
+          '¿Alguna vez accedio/ ganó un Fondo concursable No Reembolsable?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          false,
+          1,
+          1),
+      Question(
+          '¿Separa el ingreso de su hogar y el de su negocio?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          true,
+          0,
+          1),
+      Question(
+          '¿Elabora un presupuesto mensual de su hogar?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          false,
+          1,
+          1),
+      Question(
+          '¿Elabora un presupuesto mensual de su negocio?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          true,
+          0,
+          1),
+      Question(
+          'De sus ingresos mensuales de su hogar ¿Separa un monto específico para ahorrar?',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          true,
+          0,
+          1),
+      Question(
+          'De sus ingresos mensuales de su negocio ¿Separa un monto específico para ahorrar? ',
+          [
+            Option('Si', 1),
+            Option('No', 0),
+          ],
+          0,
+          true,
+          0,
+          1),
     ],
   ),
   Category(

@@ -14,11 +14,13 @@ class NextForm extends StatefulWidget {
   final Queue<Category> categories;
   final String id;
   final String name;
+  final int code;
   const NextForm(
       {super.key,
       required this.categories,
       required this.id,
-      required this.name});
+      required this.name,
+      required this.code});
 
   @override
   State<NextForm> createState() => _NextFormState();
@@ -54,7 +56,7 @@ class _NextFormState extends State<NextForm> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(                
+      child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(166, 134, 13, 108),
           automaticallyImplyLeading: false,
@@ -70,15 +72,17 @@ class _NextFormState extends State<NextForm> {
         ),
         body: Column(
           children: [
-            (category.name != category.variable)?Center(
-              child: Text(
-                category.name,
-                style: const TextStyle(
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ):Center(),
+            (category.name != category.variable)
+                ? Center(
+                    child: Text(
+                      category.name,
+                      style: const TextStyle(
+                        fontSize: 25.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                : Center(),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
@@ -112,6 +116,7 @@ class _NextFormState extends State<NextForm> {
           onPressed: () async {
             if (allQuestionsAnswered()) {
               print('comenzand');
+              int newCode = 0;
               for (var i = 0; i < category.questions.length; i++) {
                 if (category.questions[i].behavior != 2) continue;
                 for (Category category in categories_data) {
@@ -123,6 +128,7 @@ class _NextFormState extends State<NextForm> {
                     options = answers[i]?['response'];
                   }
                   print(options);
+
                   for (final option in options) {
                     if (option == category.name &&
                         (category.name == 'Prendas Tejidas a Punto' ||
@@ -136,6 +142,10 @@ class _NextFormState extends State<NextForm> {
                                 'Teñido artesanal (Plantas y químicos)' ||
                             category.name ==
                                 'Teñidos natural (Uso de plantas, flores y raíces)')) {
+                      if (category.name == 'Prendas Tejidas a Punto')
+                        newCode = 1;
+                      if (category.name == 'Peletería') newCode = 2;
+                      if (category.name == 'Tejido plano en Telar') newCode = 3;
                       setState(() {
                         widget.categories.addFirst(category);
                       });
@@ -154,17 +164,22 @@ class _NextFormState extends State<NextForm> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => NextForm(
-                        categories: widget.categories,
-                        id: widget.id,
-                        name: widget.name),
+                      categories: widget.categories,
+                      id: widget.id,
+                      name: widget.name,
+                      code: newCode != 0 ? newCode : widget.code,
+                    ),
                   ),
                 );
               } else {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        Results(id: widget.id, name: widget.name),
+                    builder: (context) => Results(
+                      id: widget.id,
+                      name: widget.name,
+                      code: newCode != 0 ? newCode : widget.code,
+                    ),
                   ),
                 );
               }
@@ -382,7 +397,7 @@ class _NextFormState extends State<NextForm> {
                                     'response': selectedOptions,
                                     'score':
                                         min(totalScore, question.totalScore),
-                                        'maxScore': question.totalScore,
+                                    'maxScore': question.totalScore,
                                     // Puedes calcular el puntaje aquí según las opciones seleccionadas
                                   };
                                 });

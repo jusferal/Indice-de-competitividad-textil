@@ -131,7 +131,7 @@ class _FormularioState extends State<Formulario> {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  NextForm(categories: queue, id: widget.id, name: widget.name),
+                  NextForm(categories: queue, id: widget.id, name: widget.name,code: 0,),
             ),
           );
           print('Actividad seleccionada: $_selectedOrganization');

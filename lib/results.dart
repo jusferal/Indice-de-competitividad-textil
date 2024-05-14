@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
 import 'package:kg_charts/kg_charts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -10,15 +11,19 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 class Results extends StatefulWidget {
   final String id;
   final String name;
+  final int code;
 
-  const Results({super.key, required this.id, required this.name});
+  const Results(
+      {super.key, required this.id, required this.name, required this.code});
   @override
   State<Results> createState() => _ResultsState();
 }
 
 class _ResultsState extends State<Results> {
   int? puntajeTotal;
+  int puntajeMaximo = 0;
   List<String> Dimensiones = [
+    "Gestión Organizacional",
     "Gestión Productiva Primaria",
     "Gestión de Diseño y Desarrollo de Productos",
     "Gestión de Acabados Textiles",
@@ -32,13 +37,33 @@ class _ResultsState extends State<Results> {
     "Agua y Saneamiento",
     "Gestión Ambiental",
     "Tecnologia e Innovación",
-    "Gestión Organizacional",
   ];
   List<int> puntajeDimension = List.filled(14, 0); // Rellena la lista con 0s
-List<int> puntajeDimensionMax = List.filled(14, 0); 
+  List<int> puntajeDimensionMax = List.filled(14, 0);
   @override
   void initState() {
     super.initState();
+    if (widget.code == 1) puntajeMaximo = 249;
+    if (widget.code == 2) puntajeMaximo = 206;
+    if (widget.code == 3) puntajeMaximo = 204;
+    puntajeDimensionMax[0] = 17;
+    puntajeDimensionMax[1] = 55;
+    widget.code == 1
+        ? puntajeDimensionMax[2] = 53
+        : widget.code == 2
+            ? puntajeDimensionMax[2] = 10
+            : puntajeDimensionMax[2] = 8;
+    puntajeDimensionMax[3] = 7;
+    puntajeDimensionMax[4] = 73;
+    puntajeDimensionMax[5] = 8;
+    puntajeDimensionMax[6] = 12;
+    puntajeDimensionMax[7] = 6;
+    puntajeDimensionMax[8] = 4;
+    puntajeDimensionMax[9] = 9;
+    puntajeDimensionMax[10] = 11;
+    puntajeDimensionMax[11] = 8;
+    puntajeDimensionMax[12] = 26;
+    puntajeDimensionMax[13] = 15;
     fetchData();
   }
 
@@ -56,7 +81,6 @@ List<int> puntajeDimensionMax = List.filled(14, 0);
       for (var i = 0; i < Dimensiones.length; i++) {
         if (Dimensiones[i] == pregunta['variable']) {
           puntajeDimension[i] += (pregunta['score'] as int);
-          puntajeDimensionMax[i] += (pregunta['maxScore'] as int);
         }
       }
     }
@@ -115,32 +139,41 @@ List<int> puntajeDimensionMax = List.filled(14, 0);
                       : RandomPositionContainer(
                           children: [
                             CircleWithText('1°',
-                                hasBorder:
-                                    (puntajeTotal! >= 0 && puntajeTotal! <= 50)
-                                        ? true
-                                        : false),
+                                hasBorder: (puntajeTotal! >= 0 &&
+                                        puntajeTotal! <= puntajeMaximo / 5.0)
+                                    ? true
+                                    : false),
                             CircleWithText('2°',
-                                hasBorder:
-                                    (puntajeTotal! >= 51 && puntajeTotal! <= 100)
-                                        ? true
-                                        : false),
+                                hasBorder: (puntajeTotal! >=
+                                            ((puntajeMaximo / 5.0) + 1) &&
+                                        puntajeTotal! <=
+                                            (puntajeMaximo / 5.0) * 2)
+                                    ? true
+                                    : false),
                             CircleWithText('3°',
-                                hasBorder:
-                                    (puntajeTotal! >= 101 && puntajeTotal! <= 150)
-                                        ? true
-                                        : false),
+                                hasBorder: (puntajeTotal! >=
+                                            ((puntajeMaximo / 5.0) * 2 + 1) &&
+                                        puntajeTotal! <=
+                                            (puntajeMaximo / 5.0) * 3)
+                                    ? true
+                                    : false),
                             CircleWithText('4°',
-                                hasBorder:
-                                    (puntajeTotal! >= 151 && puntajeTotal! <= 200)
-                                        ? true
-                                        : false),
+                                hasBorder: (puntajeTotal! >=
+                                            ((puntajeMaximo / 5.0) * 3 + 1) &&
+                                        puntajeTotal! <=
+                                            (puntajeMaximo / 5.0) * 4)
+                                    ? true
+                                    : false),
                             CircleWithText('5°',
-                                hasBorder: (puntajeTotal! >= 201 &&
-                                        puntajeTotal! <= 300)
+                                hasBorder: (puntajeTotal! >=
+                                            ((puntajeMaximo / 5.0) * 4 + 1) &&
+                                        puntajeTotal! <=
+                                            (puntajeMaximo / 5.0) * 5)
                                     ? true
                                     : false),
                           ],
                         ),
+                  tablaNiveles(),
                   RadarWidget(
                     skewing: 0,
                     radarMap: RadarMapModel(
@@ -148,26 +181,39 @@ List<int> puntajeDimensionMax = List.filled(14, 0);
                         LegendModel('', const Color(0XFF0EBD8D)),
                       ],
                       indicator: [
-                        IndicatorModel("G. Productiva Primaria", 75),
+                        IndicatorModel("G. Organizacional",
+                            puntajeDimensionMax[0].toDouble()),
+                        IndicatorModel("G. Productiva Primaria",
+                            puntajeDimensionMax[1].toDouble()),
+                        IndicatorModel("G. de Diseño y Desarrollo de Productos",
+                            puntajeDimensionMax[2].toDouble()),
+                        IndicatorModel("G. de Acabados Textiles",
+                            puntajeDimensionMax[3].toDouble()),
+                        IndicatorModel("G. de la Comerzializacion",
+                            puntajeDimensionMax[4].toDouble()),
+                        IndicatorModel("G. de Finanzas",
+                            puntajeDimensionMax[5].toDouble()),
+                        IndicatorModel("G. Tributación",
+                            puntajeDimensionMax[6].toDouble()),
                         IndicatorModel(
-                            "G. de Diseño y Desarrollo de Productos", 53),
-                        IndicatorModel("G. de Acabados Textiles", 7),
-                        IndicatorModel("G. de la Comerzializacion", 73),
-                        IndicatorModel("G. de Finanzas", 8),
-                        IndicatorModel("G. Tributación", 12),
-                        IndicatorModel("Educación", 6),
-                        IndicatorModel("Transporte", 4 ),
-                        IndicatorModel("Telecomunicaciones", 9),
-                        IndicatorModel("Salud", 11),
-                        IndicatorModel("Agua y Saneamiento", 8),
-                        IndicatorModel("G. Ambiental", 26),
-                        IndicatorModel("Tecnologiía  e Innovación", 15),
-                        IndicatorModel("G. Organizacional", 17),
+                            "Educación", puntajeDimensionMax[7].toDouble()),
+                        IndicatorModel(
+                            "Transporte", puntajeDimensionMax[8].toDouble()),
+                        IndicatorModel("Telecomunicaciones",
+                            puntajeDimensionMax[9].toDouble()),
+                        IndicatorModel(
+                            "Salud", puntajeDimensionMax[10].toDouble()),
+                        IndicatorModel("Agua y Saneamiento",
+                            puntajeDimensionMax[11].toDouble()),
+                        IndicatorModel(
+                            "G. Ambiental", puntajeDimensionMax[12].toDouble()),
+                        IndicatorModel("Tecnologiía  e Innovación",
+                            puntajeDimensionMax[13].toDouble()),
                       ],
                       data: [
                         //   MapDataModel([48,32.04,1.00,94.5,19,60,50,30,19,60,50]),
                         //MapDataModel([42.59,34.04,1.10,68,74,30,19,60,50,19,30,50,19,30]),
-                         //MapDataModel([60.0, 8.0, 0.0, 60.0, 1.0, 4.0, 3.0, 2.0, 8.0, 7.0, 6.0, 7.0, 0.0, 4.0]),
+                        //MapDataModel([60.0, 8.0, 0.0, 60.0, 1.0, 4.0, 3.0, 2.0, 8.0, 7.0, 6.0, 7.0, 0.0, 4.0]),
                         MapDataModel(
                             puntajeDimension.map((e) => e.toDouble()).toList()),
                       ],
@@ -200,6 +246,7 @@ List<int> puntajeDimensionMax = List.filled(14, 0);
                       ? CircularProgressIndicator()
                       : Table(
                           puntajeDimension: puntajeDimension,
+                          puntajeDimensionMax: puntajeDimensionMax,
                         ),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 20),
@@ -227,9 +274,62 @@ List<int> puntajeDimensionMax = List.filled(14, 0);
     );
   }
 
-  /*void fetchData() async {
-   
-  }*/
+  Widget tablaNiveles() {
+    List<List<String>> tableData = List.generate(
+      5,
+      (_) => List<String>.filled(3, ''),
+    );
+    tableData[0][1] = 'Muy Alto';
+    tableData[1][1] = 'Alto';
+    tableData[2][1] = 'Mediana';
+    tableData[3][1] = 'Bajo';
+    tableData[4][1] = 'Muy Bajo';
+    for (int i = 0; i < 5; i++) {
+      tableData[i][0] = (5 - i).toString();
+      tableData[5 - i - 1][2] =
+          '${((puntajeMaximo / 5.0) * i + (i != 0 ? 1 : 0)).toStringAsFixed(1)} - ${((puntajeMaximo / 5.0) * (i + 1)).toStringAsFixed(1)} puntos';
+    }
+    return SingleChildScrollView(
+      //scrollDirection: Axis.horizontal,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 20),
+        child: FittedBox(
+          fit: BoxFit.fitHeight,
+          child: DataTable(
+            columnSpacing: 60,
+            showBottomBorder: true,
+            columns: [
+              DataColumn(
+                  label: Text(
+                'Nivel',
+              )),
+              DataColumn(
+                label: Text(
+                  'Nivel de Competitividad',
+                ),
+              ),
+              DataColumn(label: Text('Puntaje')),
+            ],
+            rows: List.generate(
+              tableData.length,
+              (index) => DataRow(
+                cells: List.generate(
+                  tableData[index].length,
+                  (cellIndex) => DataCell(
+                    Text(
+                      tableData[index][cellIndex],
+                      maxLines: 2,
+                      softWrap: true,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class DonaConValorCentral extends StatefulWidget {
@@ -381,8 +481,12 @@ class RandomPositionContainer extends StatelessWidget {
 
 class Table extends StatefulWidget {
   final List<int> puntajeDimension;
+  final List<int> puntajeDimensionMax;
 
-  const Table({super.key, required this.puntajeDimension});
+  const Table(
+      {super.key,
+      required this.puntajeDimension,
+      required this.puntajeDimensionMax});
   @override
   _TableState createState() => _TableState();
 }
@@ -401,50 +505,36 @@ class _TableState extends State<Table> {
         'Fila ${i + 1}, Celda 4',
       ]);
     }
-    tableData[0][0] = "G. Productiva Primaria";
-    tableData[1][0] = "G. de Diseño y Desarrollo de Productos";
-    tableData[2][0] = "G. de Acabados Textiles";
-    tableData[3][0] = "G. de la Comerzializacion";
-    tableData[4][0] = "G. de Finanzas";
-    tableData[5][0] = "G. de la Tributación";
-    tableData[6][0] = "Educación";
-    tableData[7][0] = "Transporte";
-    tableData[8][0] = "Telecomunicaciones";
-    tableData[9][0] = "Salud";
-    tableData[10][0] = "Agua y Saneamiento";
-    tableData[11][0] = "G. Ambiental";
-    tableData[12][0] = "Tecnologiía e Innovación";
-    tableData[13][0] = "G. Organizacional";
-
-    tableData[0][1] = "68";
-    tableData[1][1] = "53";
-    tableData[2][1] = "7";
-    tableData[3][1] = "73";
-    tableData[4][1] = "8";
-    tableData[5][1] = "12";
-    tableData[6][1] = "6";
-    tableData[7][1] = "4";
-    tableData[8][1] = "9";
-    tableData[9][1] = "11";
-    tableData[10][1] = "8";
-    tableData[11][1] = "26";
-    tableData[12][1] = "15";
-    tableData[13][1] = "17";
-    print("tablaassasdasdasdas");
+    tableData[0][0] = "G. Organizacional";
+    tableData[1][0] = "G. Productiva Primaria";
+    tableData[2][0] = "G. de Diseño y Desarrollo de Productos";
+    tableData[3][0] = "G. de Acabados Textiles";
+    tableData[4][0] = "G. de la Comerzializacion";
+    tableData[5][0] = "G. de Finanzas";
+    tableData[6][0] = "G. de la Tributación";
+    tableData[7][0] = "Educación";
+    tableData[8][0] = "Transporte";
+    tableData[9][0] = "Telecomunicaciones";
+    tableData[10][0] = "Salud";
+    tableData[11][0] = "Agua y Saneamiento";
+    tableData[12][0] = "G. Ambiental";
+    tableData[13][0] = "Tecnologiía e Innovación";
     print(widget.puntajeDimension);
     for (int i = 0; i < 14; i++) {
+      tableData[i][1] = widget.puntajeDimensionMax[i].toString();
       tableData[i][2] = widget.puntajeDimension[i].toString();
       double porcentaje =
-          widget.puntajeDimension[i] / int.parse(tableData[i][1]) * 100.0;
-      tableData[i][3] = '$porcentaje%';
+          widget.puntajeDimension[i] / widget.puntajeDimensionMax[i] * 100.0;
+      tableData[i][3] = '${porcentaje.toStringAsFixed(2)}%';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+      //scrollDirection: Axis.horizontal,
       child: DataTable(
+        columnSpacing: 6,
         columns: const [
           DataColumn(label: Text('Factor')),
           DataColumn(label: Text('Esperado')),
@@ -456,7 +546,13 @@ class _TableState extends State<Table> {
           (index) => DataRow(
             cells: List.generate(
               tableData[index].length,
-              (cellIndex) => DataCell(Text(tableData[index][cellIndex])),
+              (cellIndex) => DataCell(
+                Text(
+                  tableData[index][cellIndex],
+                  maxLines: 2,
+                  softWrap: true,
+                ),
+              ),
             ),
           ),
         ),
