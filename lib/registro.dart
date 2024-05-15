@@ -24,7 +24,7 @@ class _RegistroState extends State<Registro> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(166, 134, 13, 108),
+          backgroundColor: const Color.fromARGB(255, 122, 51, 129),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -184,7 +184,7 @@ class _RegistroState extends State<Registro> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                            const Color.fromARGB(166, 134, 13, 108),
+                            const Color.fromARGB(255, 122, 51, 129),
                         elevation: 3,
                         padding: const EdgeInsets.symmetric(
                             horizontal: 30, vertical: 10),

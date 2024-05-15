@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
+import 'package:ict/roadmap.dart';
 import 'package:kg_charts/kg_charts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -64,6 +65,7 @@ class _ResultsState extends State<Results> {
     puntajeDimensionMax[11] = 8;
     puntajeDimensionMax[12] = 26;
     puntajeDimensionMax[13] = 15;
+    print("puntaje maximo es: $puntajeMaximo");
     fetchData();
   }
 
@@ -88,6 +90,7 @@ class _ResultsState extends State<Results> {
     print(puntajeTotal);
     print(puntajeDimension);
     print(puntajeDimensionMax);
+    print("puntaje maximo es: $puntajeMaximo");
     print("es::::::::::::::");
     print(puntajeDimension.map((e) => e.toDouble()).toList());
   }
@@ -97,7 +100,7 @@ class _ResultsState extends State<Results> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(166, 134, 13, 108),
+          backgroundColor: const Color.fromARGB(255, 122, 51, 129),
           automaticallyImplyLeading: false,
           title: Center(
             child: const Text(
@@ -105,7 +108,8 @@ class _ResultsState extends State<Results> {
               style: TextStyle(
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white),
+                  color: Colors.white,
+                  fontFamily: 'Poppins'),
             ),
           ),
         ),
@@ -121,6 +125,7 @@ class _ResultsState extends State<Results> {
                       style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
                       ),
                     ),
                   ),
@@ -178,7 +183,8 @@ class _ResultsState extends State<Results> {
                     skewing: 0,
                     radarMap: RadarMapModel(
                       legend: [
-                        LegendModel('', const Color(0XFF0EBD8D)),
+                        LegendModel(
+                            '', const Color.fromARGB(166, 134, 13, 108)),
                       ],
                       indicator: [
                         IndicatorModel("G. Organizacional",
@@ -244,14 +250,19 @@ class _ResultsState extends State<Results> {
                   ),
                   puntajeTotal == null
                       ? CircularProgressIndicator()
-                      : Table(
+                      : TableD(
                           puntajeDimension: puntajeDimension,
                           puntajeDimensionMax: puntajeDimensionMax,
                         ),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 20),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RoadMap()),
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
                             const Color.fromARGB(166, 134, 13, 108),
@@ -289,44 +300,66 @@ class _ResultsState extends State<Results> {
       tableData[5 - i - 1][2] =
           '${((puntajeMaximo / 5.0) * i + (i != 0 ? 1 : 0)).toStringAsFixed(1)} - ${((puntajeMaximo / 5.0) * (i + 1)).toStringAsFixed(1)} puntos';
     }
-    return SingleChildScrollView(
-      //scrollDirection: Axis.horizontal,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 20),
-        child: FittedBox(
-          fit: BoxFit.fitHeight,
-          child: DataTable(
-            columnSpacing: 60,
-            showBottomBorder: true,
-            columns: [
-              DataColumn(
-                  label: Text(
-                'Nivel',
-              )),
-              DataColumn(
-                label: Text(
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 20),
+      padding: EdgeInsets.symmetric(horizontal: 7),
+      child: Table(
+        columnWidths: {
+          0: FixedColumnWidth(50.0),
+          1: FixedColumnWidth(120.0),
+          2: FixedColumnWidth(175.0),
+        },
+        border: TableBorder.all(),
+        children: [
+          TableRow(
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+            ),
+            children: [
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Nivel',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
                   'Nivel de Competitividad',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              DataColumn(label: Text('Puntaje')),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Puntaje',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
-            rows: List.generate(
-              tableData.length,
-              (index) => DataRow(
-                cells: List.generate(
-                  tableData[index].length,
-                  (cellIndex) => DataCell(
-                    Text(
-                      tableData[index][cellIndex],
-                      maxLines: 2,
+          ),
+          ...tableData.map(
+            (row) => TableRow(
+              children: row.map(
+                (cell) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      cell,
                       softWrap: true,
+                      maxLines: 2,
                     ),
-                  ),
-                ),
-              ),
+                  );
+                },
+              ).toList(),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -374,6 +407,7 @@ class _DonaConValorCentralState extends State<DonaConValorCentral> {
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
                 color: const Color.fromRGBO(71, 5, 116, 1),
+                fontFamily: 'Poppins',
               ),
             ),
           ),
@@ -479,19 +513,21 @@ class RandomPositionContainer extends StatelessWidget {
   }
 }
 
-class Table extends StatefulWidget {
+class TableD extends StatefulWidget {
   final List<int> puntajeDimension;
   final List<int> puntajeDimensionMax;
 
-  const Table(
-      {super.key,
-      required this.puntajeDimension,
-      required this.puntajeDimensionMax});
+  const TableD({
+    super.key,
+    required this.puntajeDimension,
+    required this.puntajeDimensionMax,
+  });
+
   @override
-  _TableState createState() => _TableState();
+  _TableDState createState() => _TableDState();
 }
 
-class _TableState extends State<Table> {
+class _TableDState extends State<TableD> {
   List<List<String>> tableData = [];
 
   @override
@@ -509,7 +545,7 @@ class _TableState extends State<Table> {
     tableData[1][0] = "G. Productiva Primaria";
     tableData[2][0] = "G. de Diseño y Desarrollo de Productos";
     tableData[3][0] = "G. de Acabados Textiles";
-    tableData[4][0] = "G. de la Comerzializacion";
+    tableData[4][0] = "G. de la Comercialización";
     tableData[5][0] = "G. de Finanzas";
     tableData[6][0] = "G. de la Tributación";
     tableData[7][0] = "Educación";
@@ -518,8 +554,8 @@ class _TableState extends State<Table> {
     tableData[10][0] = "Salud";
     tableData[11][0] = "Agua y Saneamiento";
     tableData[12][0] = "G. Ambiental";
-    tableData[13][0] = "Tecnologiía e Innovación";
-    print(widget.puntajeDimension);
+    tableData[13][0] = "Tecnología e Innovación";
+
     for (int i = 0; i < 14; i++) {
       tableData[i][1] = widget.puntajeDimensionMax[i].toString();
       tableData[i][2] = widget.puntajeDimension[i].toString();
@@ -532,29 +568,79 @@ class _TableState extends State<Table> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      //scrollDirection: Axis.horizontal,
-      child: DataTable(
-        columnSpacing: 6,
-        columns: const [
-          DataColumn(label: Text('Factor')),
-          DataColumn(label: Text('Esperado')),
-          DataColumn(label: Text('Puntaje')),
-          DataColumn(label: Text('Porcentaje')),
-        ],
-        rows: List.generate(
-          tableData.length,
-          (index) => DataRow(
-            cells: List.generate(
-              tableData[index].length,
-              (cellIndex) => DataCell(
-                Text(
-                  tableData[index][cellIndex],
-                  maxLines: 2,
-                  softWrap: true,
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.symmetric(horizontal: 7),
+        child: Table(
+          columnWidths: {
+            0: FixedColumnWidth(138.0),
+            1: FixedColumnWidth(70.0),
+            2: FixedColumnWidth(60.0),
+            3: FixedColumnWidth(80.0),
+          },
+          border: TableBorder.all(),
+          children: [
+            TableRow(
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+              ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text(
+                    'Factor',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text(
+                    'Esperado',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text(
+                    'Puntaje',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text(
+                    'Porcentaje',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            ...tableData.map(
+              (row) => TableRow(
+                children: row.map(
+                  (cell) {
+                    return Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(2.0),
+                      child: Text(
+                        cell,
+                        softWrap: true,
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                ).toList(),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

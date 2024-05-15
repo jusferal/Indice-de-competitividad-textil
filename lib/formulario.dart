@@ -23,7 +23,7 @@ class _FormularioState extends State<Formulario> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(166, 134, 13, 108),
+        backgroundColor: const Color.fromARGB(255, 122, 51, 129),
         automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

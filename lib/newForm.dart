@@ -58,7 +58,7 @@ class _NextFormState extends State<NextForm> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(166, 134, 13, 108),
+          backgroundColor: const Color.fromARGB(255, 122, 51, 129),
           automaticallyImplyLeading: false,
           title: Center(
             child: Text(
@@ -76,6 +76,7 @@ class _NextFormState extends State<NextForm> {
                 ? Center(
                     child: Text(
                       category.name,
+                      textAlign: TextAlign.center ,
                       style: const TextStyle(
                         fontSize: 25.0,
                         fontWeight: FontWeight.bold,
@@ -118,7 +119,8 @@ class _NextFormState extends State<NextForm> {
               print('comenzand');
               int newCode = 0;
               for (var i = 0; i < category.questions.length; i++) {
-                if (category.questions[i].behavior != 2 &&category.questions[i].behavior != 3) continue;
+                if (category.questions[i].behavior != 2 &&
+                    category.questions[i].behavior != 3) continue;
                 for (Category category in categories_data) {
                   print(answers[i]?['response']);
                   final options;
@@ -145,7 +147,7 @@ class _NextFormState extends State<NextForm> {
                       if (category.name == 'Prendas Tejidas a Punto')
                         newCode = 1;
                       if (category.name == 'Peletería') newCode = 2;
-                      if (category.name == 'Tejido plano en Telar') newCode = 3;
+                      if (category.name == 'Tejido Plano en Telar') newCode = 3;
                       setState(() {
                         widget.categories.addFirst(category);
                       });
@@ -268,15 +270,33 @@ class _NextFormState extends State<NextForm> {
                     if (value == 'Si') {
                       if (index < category.questions.length - 1 &&
                           category.questions[index + 1].isVisible == false &&
-                          category.questions[index + 1].behavior == 1) {
+                          (category.questions[index + 1].behavior == 1 ||
+                              category.questions[index + 1].behavior == 3)) {
                         category.questions[index + 1].isVisible = true;
+                        if (question.text ==
+                            '¿Conoce cuantos productos debería vender al mes para cubrir tus costos y tener un margen de ganancia?') {
+                          category.questions[index + 2].isVisible = true;
+                        }
                       }
                     } else if (value == 'No') {
                       if (index < category.questions.length - 1 &&
                           category.questions[index + 1].isVisible == true &&
-                          category.questions[index + 1].behavior == 1) {
+                          (category.questions[index + 1].behavior == 1 ||
+                              category.questions[index + 1].behavior == 3)) {
                         category.questions[index + 1].isVisible = false;
+                        if (question.text ==
+                            '¿Conoce cuantos productos debería vender al mes para cubrir tus costos y tener un margen de ganancia?') {
+                          category.questions[index + 2].isVisible = false;
+                        }
                       }
+                    }
+                    if (value == 'Presencial (tiendas físicas)') {
+                      category.questions[index + 1].isVisible = true;
+                      category.questions[index + 2].isVisible = false;
+                    } else if (value ==
+                        'Digital (Redes sociales, market place, ecommerce)') {
+                      category.questions[index + 1].isVisible = false;
+                      category.questions[index + 2].isVisible = true;
                     }
                   });
                 },

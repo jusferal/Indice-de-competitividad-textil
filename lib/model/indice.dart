@@ -847,7 +847,7 @@ List<Category> categories_data = [
         0,
         true,
         0,
-        6,
+        3,
       ),
       Question(
         '¿Qué tipo de máquina remalladora utiliza?',
@@ -939,7 +939,7 @@ List<Category> categories_data = [
         1,
         true,
         0,
-        1,
+        3,
       ),
       Question(
         '¿Qué tipo(s) de control de calidad lleva a cabo?',
@@ -1106,8 +1106,8 @@ List<Category> categories_data = [
       Question(
           '¿Qué es el proceso de urdido en el telar?',
           [
-            Option('Teñido de los hilos', 1),
-            Option('Preparación y colocación de los hilos en el telar', 0),
+            Option('Teñido de los hilos', 0),
+            Option('Preparación y colocación de los hilos en el telar', 1),
             Option('Armado final del tejido', 0),
             Option('Ninguna de las anteriores', 0),
           ],
@@ -1153,7 +1153,7 @@ List<Category> categories_data = [
             Option('Detergente para lavar fibra', 0),
             Option('Otro (Especifique)', 0),
           ],
-          0,
+          1,
           true,
           0,
           0),
@@ -1165,8 +1165,8 @@ List<Category> categories_data = [
             Option('Otro (Especifique)', 1),
           ],
           0,
-          false,
-          1,
+          true,
+          0,
           2),
       Question(
           '¿Qué tipo de secado realiza?',
@@ -1207,7 +1207,7 @@ List<Category> categories_data = [
           ],
           1,
           false,
-          1,
+          3,
           0),
     ],
   ),
@@ -1226,18 +1226,6 @@ List<Category> categories_data = [
           0,
           true,
           0,
-          3),
-      Question(
-          '¿Qué tipo de procesos de acabados de la prenda, conoce?',
-          [
-            Option('Lavado', 1),
-            Option('Suavizado ', 1),
-            Option('Secado', 1),
-            Option('Vaporizado', 1),
-          ],
-          1,
-          false,
-          1,
           3),
       Question(
           '¿Qué insumos utiliza para realizar el teñido?',
@@ -1293,8 +1281,8 @@ List<Category> categories_data = [
             Option('Otro (Especifique)', 1),
           ],
           1,
-          false,
-          1,
+          true,
+          0,
           3),
       Question(
           '¿Qué dificultades presenta al momento de realizar el teñido?',
@@ -1308,7 +1296,7 @@ List<Category> categories_data = [
           1,
           true,
           0,
-          3),
+          0),
     ],
   ),
   Category(
@@ -1366,7 +1354,6 @@ List<Category> categories_data = [
           [
             Option('Teñido industrial', 0),
             Option('Teñido artesanal (Plantas y químicos)', 0),
-            Option('Color no deseado', 0),
             Option('Teñidos natural', 0),
           ],
           0,
@@ -1449,11 +1436,10 @@ List<Category> categories_data = [
           '¿Qué herramientas o recursos utilizas para gestionar las finanzas de su negocio?',
           [
             Option('Software de contabilidad o aplicaciones financieras', 3),
-            Option('Registros manuales en papel o un cuaderno', 2),
+            Option('Registros manuales en papel o un cuaderno', 1),
             Option('Registro en una plantilla de Excel', 2),
-            Option('En un cuaderno', 1),
           ],
-          0,
+          1,
           false,
           1,
           3),
@@ -1462,14 +1448,14 @@ List<Category> categories_data = [
           [
             Option(
                 'Registro detallado de todos los gastos de materiales y mano de obra',
-                2),
+                3),
             Option('Estimación basada en los costos promedio del mercado', 1),
             Option(
                 'No tengo un método establecido para calcular los costos de producción',
                 0),
             Option('Otro (Especifique)', 1),
           ],
-          1,
+          0,
           true,
           0,
           3),
@@ -1509,8 +1495,8 @@ List<Category> categories_data = [
             Option('Otro (Especifique)', 1),
           ],
           1,
-          true,
-          0,
+          false,
+          1,
           3),
       Question(
           '¿Conoce cuantos productos debería vender al mes para cubrir tus costos y tener un margen de ganancia?',
@@ -1543,8 +1529,8 @@ List<Category> categories_data = [
             Option('No estoy seguro(a)', 0),
           ],
           0,
-          true,
-          0,
+          false,
+          1,
           0),
       Question(
           '¿Cuál es su nivel de ventas mensual?',
@@ -1566,12 +1552,12 @@ List<Category> categories_data = [
             Option('1 - 10 unidades', 1),
             Option('11 - 50 unidades', 2),
             Option('50 - 100 unidades', 3),
-            Option('Más de 100 unidades', 3),
+            Option('Más de 100 unidades', 4),
           ],
           0,
           true,
           0,
-          3),
+          4),
       Question(
           '¿Qué cantidad de productos textiles vende al mes?',
           [
@@ -1607,13 +1593,13 @@ List<Category> categories_data = [
           1,
           false,
           1,
-          3),
+          4),
       Question(
           '¿Qué canales digitales utiliza actualmente para promocionar y vender sus productos textiles?',
           [
             Option('Venta en Redes sociales', 1),
             Option('Venta en un MarketPlace', 2),
-            Option('Venta por un E-commerce', 3),
+            Option('Venta por un E-commerce', 2),
             Option('Venta en Redes de negocio', 2),
             Option('Otros (especificar)', 1),
           ],
@@ -1626,23 +1612,12 @@ List<Category> categories_data = [
           [
             Option('Comprador final', 2),
             Option('Comprador intermediario', 1),
+            Option('Comprador final e intermediario', 2),
           ],
           0,
           true,
           0,
           2),
-      Question(
-          '¿Cuál es el enfoque principal para la distribución y venta de sus productos textiles?',
-          [
-            Option('Venta directa al consumidor', 0),
-            Option('Venta a intermediarios o mayoristas', 0),
-            Option('Venta a través de tiendas locales', 0),
-            Option('Venta a traves de plataformas de comercio electrónico', 0),
-          ],
-          0,
-          true,
-          0,
-          0),
       Question(
           '¿Su empresa cuenta con una Marca?',
           [
@@ -1695,7 +1670,7 @@ List<Category> categories_data = [
             Option('Utilizo programas de fidelización de clientes', 1),
             Option(
                 'No tengo estrategias específicas para gestionar la relación con los clientes',
-                1),
+                0),
           ],
           1,
           true,
@@ -2191,15 +2166,15 @@ List<Category> categories_data = [
       Question(
           '¿Qué tipo de carretera es más común en la ruta hacia la comunidad de la unidad productiva de camélidos?',
           [
-            Option('a) Asfaltada', 0),
-            Option('b) De tierra', 0),
-            Option('c) Pavimentada', 0),
-            Option('d) Otro (especificar)', 0),
+            Option('a) Asfaltada', 3),
+            Option('b) De tierra', 2),
+            Option('c) Pavimentada', 1),
+            Option('d) Otro (especificar)', 1),
           ],
           0,
           true,
           0,
-          0),
+          3),
       Question(
           '¿Cuánto tiempo en promedio tardan los trabajadores en llegar desde la ciudad más cercana a la comunidad?',
           [
@@ -2229,7 +2204,7 @@ List<Category> categories_data = [
       Question(
           '¿Qué impacto tiene el estado de las carreteras en el transporte de productos textiles de la unidad productiva?',
           [
-            Option('a) Puede causar retrasos y daños en la mercancía', 1),
+            Option('a) Puede causar retrasos y daños en la mercancía', 0),
             Option('b) No afecta la competitividad', 0),
             Option('c) Reduce los costos de transporte', 0),
             Option('d) Mejora la eficiencia logística', 0),
@@ -2237,7 +2212,7 @@ List<Category> categories_data = [
           0,
           true,
           0,
-          1),
+          0),
     ],
   ),
   Category(
@@ -2260,8 +2235,8 @@ List<Category> categories_data = [
       Question(
           '¿Qué tipo de acceso a internet es más comúnmente utilizado en su comunoidad/  local de residencia?',
           [
-            Option('a) Internet de banda ancha fija', 2),
-            Option('b) Internet móvil (3G/4G)', 2),
+            Option('a) Internet de banda ancha fija', 1),
+            Option('b) Internet móvil (3G/4G)', 1),
             Option('c) Internet satelital', 1),
             Option('d) No se cuenta con acceso a internet', 0),
           ],
@@ -2511,7 +2486,7 @@ List<Category> categories_data = [
             Option('No estoy seguro/a de lo que significa', 0),
             Option('Otra respuesta (especificar).', 1),
           ],
-          1,
+          0,
           true,
           0,
           2),
@@ -2534,66 +2509,65 @@ List<Category> categories_data = [
             Option('c) Reducimos el consumo de agua y energía.', 1),
             Option('d) Ninguna de las anteriores.', 0),
           ],
-          0,
+          1,
           false,
           1,
-          2),
+          3),
       Question(
           '¿Su Asociación u Cooperativa cuenta con un sistema de recolección de residuos sólidos?',
           [
             Option(
-                'a) Sí, contamos con un servicio regular de recolección.', 0),
-            Option('b) A veces, el servicio de recolección es irregular.', 0),
+                'a) Sí, contamos con un servicio regular de recolección.', 2),
+            Option('b) A veces, el servicio de recolección es irregular.', 1),
             Option('c) No, no tenemos servicio de recolección de residuos.', 0),
-            Option('No realizo ninguna acción', 0),
           ],
           0,
           true,
           0,
-          0),
+          2),
       Question(
           '¿Qué acciones específicas se toman en su Asociación y/o Cooperativa para reducir el impacto ambiental en su proceso de producción textil?',
           [
-            Option('Uso de tintes naturales y orgánicos', 0),
-            Option('Reciclaje de materiales y residuos', 0),
-            Option('Reducción de consumo de agua y energía eléctrica', 0),
+            Option('Uso de tintes naturales y orgánicos', 1),
+            Option('Reciclaje de materiales y residuos', 1),
+            Option('Reducción de consumo de agua y energía eléctrica', 1),
             Option('No realizo ninguna acción', 0),
           ],
           1,
           true,
           0,
-          0),
+          3),
       Question(
           'En su proceso de producción textil, ¿Qué técnicas ancestrales utilizan para reducir el impacto ambiental?',
           [
-            Option('Re uso de mermas', 0),
+            Option('Re uso de mermas', 1),
             Option(
-                'Teñido natural con plantas y minerales locales de la zona', 0),
-            Option('Uso de técnicas de tejido tradicional (Away, telar)', 0),
-            Option('Otros (especificar)', 0),
+                'Teñido natural con plantas y minerales locales de la zona', 1),
+            Option('Uso de técnicas de tejido tradicional (Away, telar)', 1),
+            Option('Otros (especificar)', 1),
           ],
           1,
           true,
           0,
-          0),
+          3),
       Question(
           '¿Qué estrategias aplica para sensibilizar a tu comunidad y clientes sobre la importancia de la gestión ambiental en la producción textil?',
           [
             Option(
                 'Organización de talleres y eventos educativos sobre prácticas sostenibles',
-                0),
+                1),
             Option(
                 'Creación de campañas de sensibilización en redes sociales y medios locales',
-                0),
+                1),
             Option(
                 'Inclusión de información sobre la sostenibilidad en el etiquetado y marketing de sus productos textiles',
-                0),
+                1),
             Option('Ninguna estrategia', 0),
           ],
-          0,
+          1,
           true,
           0,
-          0),
+          3),
     ],
   ),
   Category(
@@ -2612,7 +2586,7 @@ List<Category> categories_data = [
             Option('No estoy seguro/a de lo que significa', 0),
             Option('Otra respuesta (especificar).', 1),
           ],
-          1,
+          0,
           true,
           0,
           2),
@@ -2662,13 +2636,13 @@ List<Category> categories_data = [
           '¿Qué medidas concretas ha implementado su Asociación/Cooperativa para reducir su impacto ambiental?',
           [
             Option(
-                'a) Uso de materiales reciclables en nuestros productos.', 0),
+                'a) Uso de materiales reciclables en nuestros productos.', 1),
             Option(
                 'b) Reducción del consumo de agua y energía en procesos productivos.',
-                0),
+                1),
             Option(
                 'c) Implementación de tecnologías limpias para reducir emisiones',
-                0),
+                1),
           ],
           1,
           true,
@@ -2733,7 +2707,7 @@ List<Category> categories_data = [
                 0),
             Option('Máquina industrial (Máquinas de tejer industriales)', 0),
           ],
-          1,
+          0,
           true,
           0,
           0),
