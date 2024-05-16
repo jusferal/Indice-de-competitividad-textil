@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Indice de Competitividad Textil'),
+      home:  MyHomePage(title: 'Indice de Competitividad Textil'),
     );
   }
 }
@@ -133,3 +133,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+

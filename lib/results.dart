@@ -54,7 +54,7 @@ class _ResultsState extends State<Results> {
         : widget.code == 2
             ? puntajeDimensionMax[2] = 10
             : puntajeDimensionMax[2] = 8;
-    puntajeDimensionMax[3] = 7;
+    puntajeDimensionMax[3] = 19;
     puntajeDimensionMax[4] = 73;
     puntajeDimensionMax[5] = 8;
     puntajeDimensionMax[6] = 12;
@@ -579,45 +579,19 @@ class _TableDState extends State<TableD> {
             2: FixedColumnWidth(60.0),
             3: FixedColumnWidth(80.0),
           },
-          border: TableBorder.all(),
+          border: TableBorder.symmetric(inside: BorderSide()),
           children: [
             TableRow(
               decoration: BoxDecoration(
                 color: Colors.grey[300],
               ),
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Text(
-                    'Factor',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Text(
-                    'Esperado',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Text(
-                    'Puntaje',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Text(
-                    'Porcentaje',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                ...["Factor", "Esperado", "Puntaje", "Porcentaje"].map(
+                  (header) => Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(header,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
