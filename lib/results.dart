@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
@@ -59,7 +60,7 @@ class _ResultsState extends State<Results> {
     puntajeDimensionMax[5] = 8;
     puntajeDimensionMax[6] = 12;
     puntajeDimensionMax[7] = 6;
-    puntajeDimensionMax[8] = 4;
+    puntajeDimensionMax[8] = 7;
     puntajeDimensionMax[9] = 9;
     puntajeDimensionMax[10] = 11;
     puntajeDimensionMax[11] = 8;
@@ -574,45 +575,131 @@ class _TableDState extends State<TableD> {
         padding: EdgeInsets.symmetric(horizontal: 7),
         child: Table(
           columnWidths: {
-            0: FixedColumnWidth(138.0),
-            1: FixedColumnWidth(70.0),
-            2: FixedColumnWidth(60.0),
-            3: FixedColumnWidth(80.0),
+            0: FixedColumnWidth(22.0),
+            1: FixedColumnWidth(348.0),
           },
-          border: TableBorder.symmetric(inside: BorderSide()),
+          border: TableBorder.all(),
           children: [
             TableRow(
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-              ),
               children: [
-                ...["Factor", "Esperado", "Puntaje", "Porcentaje"].map(
-                  (header) => Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: Text(header,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                  ),
+                Container(),
+                Table(
+                  columnWidths: {
+                    0: FixedColumnWidth(138.0),
+                    1: FixedColumnWidth(70.0),
+                    2: FixedColumnWidth(60.0),
+                    3: FixedColumnWidth(80.0),
+                  },
+                  border: TableBorder.symmetric(inside: BorderSide()),
+                  children: [
+                    TableRow(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                      ),
+                      children: [
+                        ...["Factor", "Esperado", "Puntaje", "Porcentaje"].map(
+                          (header) => Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Text(header,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
-            ...tableData.map(
-              (row) => TableRow(
-                children: row.map(
-                  (cell) {
-                    return Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.all(2.0),
-                      child: Text(
-                        cell,
-                        softWrap: true,
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
-                      ),
-                    );
+            TableRow(
+              children: [
+                 Container(
+                  color: Colors.red,
+                 alignment: Alignment.center,
+                 height: 200,
+                 child: RotatedBox(
+                   quarterTurns: 3,
+                   child: Text(
+                     'Interno',
+                     textAlign: TextAlign.center,
+                   ),
+                 ),
+               ),
+                Table(
+                  columnWidths: {
+                    0: FixedColumnWidth(138.0),
+                    1: FixedColumnWidth(70.0),
+                    2: FixedColumnWidth(60.0),
+                    3: FixedColumnWidth(80.0),
                   },
-                ).toList(),
-              ),
+                  border: TableBorder.symmetric(inside: BorderSide()),
+                  children: [
+                    ...tableData.sublist(0, 7).map(
+                          (row) => TableRow(
+                            children: row.map(
+                              (cell) {
+                                return Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Text(
+                                    cell,
+                                    softWrap: true,
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                );
+                              },
+                            ).toList(),
+                          ),
+                        ),
+                  ],
+                )
+              ],
+            ),
+            TableRow(
+              children: [
+               Container(
+                 alignment: Alignment.center,
+                 height: 200,
+                 child: RotatedBox(
+                   quarterTurns: 3,
+                   child: Text(
+                     'Externo',
+                     textAlign: TextAlign.center,
+                   ),
+                 ),
+               ),
+                Table(
+                  columnWidths: {
+                    0: FixedColumnWidth(138.0),
+                    1: FixedColumnWidth(70.0),
+                    2: FixedColumnWidth(60.0),
+                    3: FixedColumnWidth(80.0),
+                  },
+                  border: TableBorder.symmetric(inside: BorderSide()),
+                  children: [
+                    ...tableData.sublist(7, 14).map(
+                          (row) => TableRow(
+                            children: row.map(
+                              (cell) {
+                                return Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Text(
+                                    cell,
+                                    softWrap: true,
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                );
+                              },
+                            ).toList(),
+                          ),
+                        ),
+                  ],
+                )
+              ],
             ),
           ],
         ),

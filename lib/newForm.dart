@@ -76,7 +76,7 @@ class _NextFormState extends State<NextForm> {
                 ? Center(
                     child: Text(
                       category.name,
-                      textAlign: TextAlign.center ,
+                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 25.0,
                         fontWeight: FontWeight.bold,
@@ -257,7 +257,6 @@ class _NextFormState extends State<NextForm> {
                 groupValue: answers[index]?['response'],
                 onChanged: (value) {
                   setState(() {
-                    //answers[index] = value;
                     answers[index] = {
                       'dimension': category.dimension,
                       'variable': category.variable,
@@ -298,11 +297,36 @@ class _NextFormState extends State<NextForm> {
                       category.questions[index + 1].isVisible = false;
                       category.questions[index + 2].isVisible = true;
                     }
+
+                    if (value == 'Otro (Especifique)') {
+                      if (!textEditingControllerMap.containsKey(index)) {
+                        textEditingControllerMap[index] =
+                            TextEditingController();
+                      }
+                    } else {
+                      textEditingControllerMap[index]?.dispose();
+                      textEditingControllerMap.remove(index);
+                    }
                   });
                 },
               );
             }).toList(),
           ),
+          if (answers[index]?['response'] == 'Otro (Especifique)')
+            Padding(
+              padding: const EdgeInsets.only(left: 42.0),
+              child: TextFormField(
+                controller: textEditingControllerMap[index],
+                decoration: InputDecoration(
+                  hintText: 'Especifique aquí',
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    answers[index]?['response'] = 'Otro (Especifique): $value';
+                  });
+                },
+              ),
+            ),
         ],
       ),
     );

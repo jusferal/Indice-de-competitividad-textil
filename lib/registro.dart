@@ -60,7 +60,9 @@ class _RegistroState extends State<Registro> {
                   TextFormCustom(
                     label: 'Nombre(Nombres y Apellidos)/Razon Social',
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().isEmpty) {
                         return 'Por favor, ingrese este campo';
                       }
                       return null;
@@ -69,9 +71,15 @@ class _RegistroState extends State<Registro> {
                   ),
                   TextFormCustom(
                     label: 'DNI/RUC',
+                    keyboard: TextInputType.number,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().isEmpty) {
                         return 'Por favor, ingrese este campo';
+                      }
+                      if (value.length < 8) {
+                        return 'Debe tener al menos 8 dígitos';
                       }
                       return null;
                     },
@@ -81,8 +89,13 @@ class _RegistroState extends State<Registro> {
                     label: 'Celular',
                     keyboard: TextInputType.phone,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().isEmpty) {
                         return 'Por favor, ingrese este campo';
+                      }
+                      if (value.length < 9) {
+                        return 'Debe tener al menos 9 dígitos';
                       }
                       return null;
                     },
@@ -92,9 +105,13 @@ class _RegistroState extends State<Registro> {
                     label: 'Correo Electrónico',
                     keyboard: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().isEmpty) {
                         return 'Por favor, ingrese este campo';
-                      } else if (!value.contains('@')) {
+                      } else if (!RegExp(
+                              r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                          .hasMatch(value)) {
                         return 'Ingrese un correo electrónico válido';
                       }
                       return null;
@@ -111,7 +128,9 @@ class _RegistroState extends State<Registro> {
                   TextFormCustom(
                     label: 'Región',
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().isEmpty) {
                         return 'Por favor, ingrese este campo';
                       }
                       return null;
@@ -121,7 +140,9 @@ class _RegistroState extends State<Registro> {
                   TextFormCustom(
                     label: 'Provincia',
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().isEmpty) {
                         return 'Por favor, ingrese este campo';
                       }
                       return null;
@@ -131,7 +152,9 @@ class _RegistroState extends State<Registro> {
                   TextFormCustom(
                     label: 'Distrito',
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().isEmpty) {
                         return 'Por favor, ingrese este campo';
                       }
                       return null;
@@ -142,7 +165,9 @@ class _RegistroState extends State<Registro> {
                     label: 'Dirección',
                     keyboard: TextInputType.streetAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          value.trim().isEmpty) {
                         return 'Por favor, ingrese este campo';
                       }
                       return null;
@@ -165,6 +190,7 @@ class _RegistroState extends State<Registro> {
                               'region': _regionController.text,
                               'province': _provinciaController.text,
                               'district': _distritoController.text,
+                              'address': _direccionController.text,
                               'numDocument': _dniController.text,
                             },
                           ]);
