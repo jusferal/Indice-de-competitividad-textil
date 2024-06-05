@@ -565,18 +565,33 @@ class _TableDState extends State<TableD> {
       tableData[i][3] = '${porcentaje.toStringAsFixed(2)}%';
     }
   }
+ bool isPercentage(String value) {
+    final percentageRegExp = RegExp(r'^\d{1,3}(\.\d+)?%$');
+    return percentageRegExp.hasMatch(value);
+  }
 
+  Color getColor(String value) {
+    if (isPercentage(value)) {
+      double percentage = double.parse(value.replaceAll('%', ''));
+      if (percentage < 50.0) {
+        return Colors.red;
+      } else {
+        return Colors.green;
+      }
+    }
+    return Colors.transparent;
+  }
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 20),
-        padding: EdgeInsets.symmetric(horizontal: 7),
+        padding: EdgeInsets.symmetric(horizontal: 2),
         child: Table(
           columnWidths: {
-            0: FixedColumnWidth(22.0),
-            1: FixedColumnWidth(348.0),
+            0: FixedColumnWidth(16.0),
+            1: FixedColumnWidth(340.0),
           },
           border: TableBorder.all(),
           children: [
@@ -586,9 +601,9 @@ class _TableDState extends State<TableD> {
                 Table(
                   columnWidths: {
                     0: FixedColumnWidth(138.0),
-                    1: FixedColumnWidth(70.0),
-                    2: FixedColumnWidth(60.0),
-                    3: FixedColumnWidth(80.0),
+                    1: FixedColumnWidth(67.0),
+                    2: FixedColumnWidth(57.0),
+                    3: FixedColumnWidth(78.0),
                   },
                   border: TableBorder.symmetric(inside: BorderSide()),
                   children: [
@@ -599,7 +614,7 @@ class _TableDState extends State<TableD> {
                       children: [
                         ...["Factor", "Esperado", "Puntaje", "Porcentaje"].map(
                           (header) => Padding(
-                            padding: const EdgeInsets.all(4.0),
+                            padding: const EdgeInsets.all(3.0),
                             child: Text(header,
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
@@ -614,24 +629,27 @@ class _TableDState extends State<TableD> {
             ),
             TableRow(
               children: [
-                 Container(
-                  color: Colors.red,
-                 alignment: Alignment.center,
-                 height: 200,
-                 child: RotatedBox(
-                   quarterTurns: 3,
-                   child: Text(
-                     'Interno',
-                     textAlign: TextAlign.center,
-                   ),
-                 ),
-               ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.fill,
+                  child: Container(
+                    color: Colors.yellow[300],
+                    alignment: Alignment.center,
+                    height: 200,
+                    child: RotatedBox(
+                      quarterTurns: 3,
+                      child: Text(
+                        'Interno',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
                 Table(
                   columnWidths: {
                     0: FixedColumnWidth(138.0),
-                    1: FixedColumnWidth(70.0),
-                    2: FixedColumnWidth(60.0),
-                    3: FixedColumnWidth(80.0),
+                    1: FixedColumnWidth(67.0),
+                    2: FixedColumnWidth(57.0),
+                    3: FixedColumnWidth(78.0),
                   },
                   border: TableBorder.symmetric(inside: BorderSide()),
                   children: [
@@ -639,14 +657,18 @@ class _TableDState extends State<TableD> {
                           (row) => TableRow(
                             children: row.map(
                               (cell) {
-                                return Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Text(
-                                    cell,
-                                    softWrap: true,
-                                    maxLines: 2,
-                                    textAlign: TextAlign.center,
+                                return TableCell(
+                                  verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.all(2.0),
+                                    color: getColor(cell),
+                                    child: Text(
+                                      cell,
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 );
                               },
@@ -659,23 +681,26 @@ class _TableDState extends State<TableD> {
             ),
             TableRow(
               children: [
-               Container(
-                 alignment: Alignment.center,
-                 height: 200,
-                 child: RotatedBox(
-                   quarterTurns: 3,
-                   child: Text(
-                     'Externo',
-                     textAlign: TextAlign.center,
-                   ),
-                 ),
-               ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.fill,
+                  child: Container(
+                    alignment: Alignment.center,
+                    color: Color.fromARGB(255, 39, 147, 197),
+                    child: RotatedBox(
+                      quarterTurns: 3,
+                      child: Text(
+                        'Externo',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
                 Table(
                   columnWidths: {
                     0: FixedColumnWidth(138.0),
-                    1: FixedColumnWidth(70.0),
-                    2: FixedColumnWidth(60.0),
-                    3: FixedColumnWidth(80.0),
+                    1: FixedColumnWidth(67.0),
+                    2: FixedColumnWidth(57.0),
+                    3: FixedColumnWidth(78.0),
                   },
                   border: TableBorder.symmetric(inside: BorderSide()),
                   children: [
@@ -683,14 +708,20 @@ class _TableDState extends State<TableD> {
                           (row) => TableRow(
                             children: row.map(
                               (cell) {
-                                return Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.all(2.0),
-                                  child: Text(
-                                    cell,
-                                    softWrap: true,
-                                    maxLines: 2,
-                                    textAlign: TextAlign.center,
+                                return TableCell(
+                                  verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.all(2.0),
+                                    color: getColor(cell),
+                                    child: Center(
+                                      child: Text(
+                                        cell,
+                                        softWrap: true,
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
                                   ),
                                 );
                               },

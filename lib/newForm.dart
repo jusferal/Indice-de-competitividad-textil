@@ -15,12 +15,14 @@ class NextForm extends StatefulWidget {
   final String id;
   final String name;
   final int code;
+  final Map<int, Map<String, dynamic>> globalAnswers;
   const NextForm(
       {super.key,
       required this.categories,
       required this.id,
       required this.name,
-      required this.code});
+      required this.code,
+      required this.globalAnswers});
 
   @override
   State<NextForm> createState() => _NextFormState();
@@ -29,7 +31,7 @@ class NextForm extends StatefulWidget {
 class _NextFormState extends State<NextForm> {
   Map<int, Map<String, dynamic>> answers = {};
   Map<int, TextEditingController> textEditingControllerMap = {};
-  late final Category category;
+  late Category category;
   @override
   void initState() {
     super.initState();
@@ -37,13 +39,16 @@ class _NextFormState extends State<NextForm> {
     widget.categories.forEach((elemento) {
       print(elemento.name);
     });
-    category = widget.categories.removeFirst();
+    if (widget.categories.isNotEmpty) {
+      category = widget.categories.removeFirst();
+    } else {
+      Navigator.pop(context); // No hay más categorías, regresar
+    }
     for (var i = 0; i < category.questions.length; i++) {
-      bool ok = false;
-      for (var option in category.questions[i].options) {
-        if (option.text == 'Otro (Especifique)') ok = true;
-      }
-      if (ok || category.questions[i].typeWidget == 2) {
+      bool isOtherOption = category.questions[i].options
+          .any((option) => option.text == 'Otro (Especifique)');
+
+      if (isOtherOption || category.questions[i].typeWidget == 2) {
         textEditingControllerMap[i] = TextEditingController();
       }
     }
@@ -70,48 +75,49 @@ class _NextFormState extends State<NextForm> {
             ),
           ),
         ),
-        body: Column(
-          children: [
-            (category.name != category.variable)
-                ? Center(
-                    child: Text(
-                      category.name,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 25.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+        body: Form(
+          child: Column(
+            children: [
+              if (category.name != category.variable)
+                Center(
+                  child: Text(
+                    category.name,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
                     ),
-                  )
-                : Center(),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: ListView.builder(
-                  itemCount: category.questions.length,
-                  itemBuilder: (context, index) {
-                    final question = category.questions[index];
-                    switch (question.typeWidget) {
-                      case 0:
-                        return Visibility(
-                            visible: question.isVisible,
-                            child: buildRadioListTile(question, index));
-                      case 1:
-                        return Visibility(
-                            visible: question.isVisible,
-                            child: buildCheckboxListTile(question, index));
-                      case 2:
-                        return Visibility(
-                            visible: question.isVisible,
-                            child: buildTextFormField(question, index));
-                      default:
-                        return const SizedBox();
-                    }
-                  },
+                  ),
+                ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: ListView.builder(
+                    itemCount: category.questions.length,
+                    itemBuilder: (context, index) {
+                      final question = category.questions[index];
+                      switch (question.typeWidget) {
+                        case 0:
+                          return Visibility(
+                              visible: question.isVisible,
+                              child: buildRadioListTile(question, index));
+                        case 1:
+                          return Visibility(
+                              visible: question.isVisible,
+                              child: buildCheckboxListTile(question, index));
+                        case 2:
+                          return Visibility(
+                              visible: question.isVisible,
+                              child: buildTextFormField(question, index));
+                        default:
+                          return const SizedBox();
+                      }
+                    },
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
@@ -161,6 +167,7 @@ class _NextFormState extends State<NextForm> {
                 print(elemento.name);
               });
               await saveDataToSupabase();
+              saveAnswers();
               if (widget.categories.length != 0) {
                 Navigator.push(
                   context,
@@ -170,6 +177,7 @@ class _NextFormState extends State<NextForm> {
                       id: widget.id,
                       name: widget.name,
                       code: newCode != 0 ? newCode : widget.code,
+                      globalAnswers: widget.globalAnswers,
                     ),
                   ),
                 );
@@ -212,6 +220,12 @@ class _NextFormState extends State<NextForm> {
     );
   }
 
+  Future<void> saveAnswers() async {
+    for (var entry in answers.entries) {
+      widget.globalAnswers[entry.key] = entry.value;
+    }
+  }
+
   String _formatTwoDigits(int num) {
     return num.toString().padLeft(2, '0');
   }
@@ -232,10 +246,10 @@ class _NextFormState extends State<NextForm> {
 
   bool allQuestionsAnswered() {
     for (int i = 0; i < category.questions.length; i++) {
-      if (category.questions[i].isVisible == false) continue;
-      if (answers[i] == null ||
-          answers[i]?['response'] == null ||
-          answers[i]?['response'].isEmpty) {
+      if (category.questions[i].isVisible &&
+          (answers[i] == null ||
+              answers[i]?['response'] == null ||
+              answers[i]?['response'].isEmpty)) {
         return false;
       }
     }
@@ -254,7 +268,7 @@ class _NextFormState extends State<NextForm> {
               return RadioListTile(
                 title: Text(option.text),
                 value: option.text,
-                groupValue: answers[index]?['response'],
+                groupValue: answers[index]?['response']?.split(':')[0] ?? '',
                 onChanged: (value) {
                   setState(() {
                     answers[index] = {
@@ -303,16 +317,19 @@ class _NextFormState extends State<NextForm> {
                         textEditingControllerMap[index] =
                             TextEditingController();
                       }
+                      print(
+                          'contenido del textform actual: ${textEditingControllerMap[index]} en $index');
                     } else {
                       textEditingControllerMap[index]?.dispose();
                       textEditingControllerMap.remove(index);
+                      //textEditingControllerMap[index]?.clear();
                     }
                   });
                 },
               );
             }).toList(),
           ),
-          if (answers[index]?['response'] == 'Otro (Especifique)')
+          if (answers[index]?['response']?.split(':')[0] == 'Otro (Especifique)')
             Padding(
               padding: const EdgeInsets.only(left: 42.0),
               child: TextFormField(
@@ -321,6 +338,7 @@ class _NextFormState extends State<NextForm> {
                   hintText: 'Especifique aquí',
                 ),
                 onChanged: (value) {
+                  print("eeeeeeeeeeeeee");
                   setState(() {
                     answers[index]?['response'] = 'Otro (Especifique): $value';
                   });
@@ -331,178 +349,148 @@ class _NextFormState extends State<NextForm> {
       ),
     );
   }
+Widget buildCheckboxListTile(Question question, int index) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(question.text),
+        Column(
+          children: question.options.map((option) {
+            bool isSelected = false;
+            if (answers[index]?['response'] is List) {
+              isSelected = (answers[index]?['response'] as List).contains(option.text);
+            } else if (answers[index]?['response'] is String) {
+              isSelected = answers[index]?['response'] == option.text;
+            }
 
-  Widget buildCheckboxListTile(Question question, int index) {
-    // Define un controlador para el campo de texto personalizado
-    TextEditingController customInputController = TextEditingController();
-    String content = textEditingControllerMap[index] != null
-        ? textEditingControllerMap[index]!.text
-        : '';
+            return CheckboxListTile(
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text(option.text),
+              value: isSelected,
+              onChanged: (value) {
+                setState(() {
+                  List<String> selectedOptions;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(question.text),
-          Column(
-            children: question.options.asMap().entries.map((entry) {
-              final int optionIndex = entry.key;
-              final Option option = entry.value;
-              if (option.text == 'Otro (Especifique)') {
-                // Si la opción es "Otro", mostrar un TextFormField para ingresar un valor personalizado
-                return StatefulBuilder(
-                  builder: (context, setState) {
-                    return Column(
-                      children: [
-                        CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.leading,
-                          title: Text(option.text),
-                          value: answers[index]?['response']
-                                  ?.contains(option.text) ??
-                              false,
-                          onChanged: (value) {
-                            setState(() {
-                              List<String> selectedOptions =
-                                  answers[index]?['response']?.cast<String>() ??
-                                      [];
-                              if (value != null) {
-                                if (value) {
-                                  selectedOptions.add(option.text);
-                                } else {
-                                  selectedOptions.remove(option.text);
-                                }
-                                print('demas elementos pero con otro');
-                                print(selectedOptions);
-                                int totalScore = selectedOptions
-                                    .map((selectedOption) {
-                                  var option = question.options.firstWhere(
-                                      (opt) => opt.text == selectedOption,
-                                      orElse: () => Option('', 0));
-                                  return option.score;
-                                }).fold(
-                                        0,
-                                        (previousValue, score) =>
-                                            previousValue + score);
+                  if (answers[index]?['response'] is List) {
+                    selectedOptions = List<String>.from(answers[index]?['response']);
+                  } else if (answers[index]?['response'] is String) {
+                    selectedOptions = [answers[index]?['response']];
+                  } else {
+                    selectedOptions = [];
+                  }
 
-                                answers[index] = {
-                                  'dimension': category.dimension,
-                                  'variable': category.variable,
-                                  'category': category.name,
-                                  'question': question.text,
-                                  'response': selectedOptions,
-                                  'score': min(totalScore, question.totalScore),
-                                  'maxScore': question.totalScore,
-                                  // Puedes calcular el puntaje aquí según las opciones seleccionadas
-                                };
-                              }
-                            });
-                          },
-                        ),
-                        if (answers[index]?['response']
-                                ?.contains(option.text) ??
-                            false)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 42.0),
-                            child: TextFormField(
-                              controller: textEditingControllerMap[index],
-                              onChanged: (value) {
-                                setState(() {
-                                  // Actualizar la respuesta con el valor personalizado ingresado
-                                  List<String> selectedOptions = answers[index]
-                                              ?['response']
-                                          ?.cast<String>() ??
-                                      [];
-                                  if (value != null) {
-                                    if (selectedOptions.contains(content)) {
-                                      selectedOptions.remove(content);
-                                    }
-                                    content = 'Otro (Especifique): ${value}';
-                                    selectedOptions.add(content);
-                                  }
-                                  print('se ingreso algo');
-                                  print(selectedOptions);
-                                  int totalScore = selectedOptions
-                                      .map((selectedOption) {
-                                    var option = question.options.firstWhere(
-                                        (opt) => opt.text == selectedOption,
-                                        orElse: () => Option('', 0));
-                                    return option.score;
-                                  }).fold(
-                                          0,
-                                          (previousValue, score) =>
-                                              previousValue + score);
-
-                                  answers[index] = {
-                                    'dimension': category.dimension,
-                                    'variable': category.variable,
-                                    'category': category.name,
-                                    'question': question.text,
-                                    'response': selectedOptions,
-                                    'score':
-                                        min(totalScore, question.totalScore),
-                                    'maxScore': question.totalScore,
-                                    // Puedes calcular el puntaje aquí según las opciones seleccionadas
-                                  };
-                                });
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Ingrese otro valor',
-                              ),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                );
-              } else {
-                // Otras opciones que no son "Otro"
-                return CheckboxListTile(
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Text(option.text),
-                  value: answers[index]?['response']?.contains(option.text) ??
-                      false,
-                  onChanged: (value) {
-                    setState(() {
-                      List<String> selectedOptions =
-                          answers[index]?['response']?.cast<String>() ?? [];
-                      if (value != null) {
-                        if (value) {
-                          selectedOptions.add(option.text);
-                        } else {
-                          selectedOptions.remove(option.text);
+                  if (value != null) {
+                    if (value) {
+                      if (option.text == 'Ninguna de las anteriores') {
+                        selectedOptions.clear();
+                        selectedOptions.add(option.text);
+                      } else if (option.text == 'Todas las anteriores') {
+                        selectedOptions.clear();
+                        selectedOptions.addAll(question.options
+                            .where((o) => o.text != 'Ninguna de las anteriores' && o.text != 'Otro (Especifique)')
+                            .map((o) => o.text));
+                      } else {
+                        selectedOptions.add(option.text);
+                        if (selectedOptions.contains('Ninguna de las anteriores')) {
+                          selectedOptions.remove('Ninguna de las anteriores');
                         }
-                        print("si no hay otros::");
-                        print(selectedOptions);
-                        int totalScore = selectedOptions.map((selectedOption) {
-                          var option = question.options.firstWhere(
-                              (opt) => opt.text == selectedOption,
-                              orElse: () => Option('', 0));
-                          return option.score;
-                        }).fold(
-                            0, (previousValue, score) => previousValue + score);
-
-                        answers[index] = {
-                          'dimension': category.dimension,
-                          'variable': category.variable,
-                          'category': category.name,
-                          'question': question.text,
-                          'response': selectedOptions,
-                          'score': min(totalScore, question.totalScore),
-                          'maxScore': question.totalScore,
-                          // Puedes calcular el puntaje aquí según las opciones seleccionadas
-                        };
                       }
-                    });
-                  },
-                );
-              }
-            }).toList(),
+                    } else {
+                      selectedOptions.remove(option.text);
+                      if (option.text == 'Todas las anteriores') {
+                        selectedOptions.clear();
+                      }
+                    }
+
+                    if (selectedOptions.contains('Todas las anteriores') &&
+                        selectedOptions.length < question.options.length - 1) {
+                      selectedOptions.remove('Todas las anteriores');
+                    }
+
+                    if (selectedOptions.contains('Ninguna de las anteriores') &&
+                        selectedOptions.length > 1) {
+                      selectedOptions.removeWhere((element) => element != 'Ninguna de las anteriores');
+                    }
+
+                    int totalScore = selectedOptions
+                        .map((selectedOption) => question.options
+                            .firstWhere((opt) => opt.text == selectedOption,
+                                orElse: () => Option('', 0))
+                            .score)
+                        .fold(0, (previousValue, score) => previousValue + score);
+
+                    answers[index] = {
+                      'dimension': category.dimension,
+                      'variable': category.variable,
+                      'category': category.name,
+                      'question': question.text,
+                      'response': selectedOptions.isNotEmpty ? selectedOptions : '',
+                      'score': min(totalScore, question.totalScore),
+                      'maxScore': question.totalScore,
+                    };
+
+                    if (selectedOptions.contains('Otro (Especifique)') && 
+                        !textEditingControllerMap.containsKey(index)) {
+                      textEditingControllerMap[index] = TextEditingController();
+                    } else if (!selectedOptions.contains('Otro (Especifique)')) {
+                      textEditingControllerMap[index]?.dispose();
+                      textEditingControllerMap.remove(index);
+                    }
+                  }
+                });
+              },
+            );
+          }).toList(),
+        ),
+        if ((answers[index]?['response'] is List &&
+                (answers[index]?['response'] as List).contains('Otro (Especifique)')) ||
+            (answers[index]?['response'] is String && (answers[index]?['response'] as String).startsWith('Otro (Especifique)')))
+          Padding(
+            padding: const EdgeInsets.only(left: 42.0),
+            child: TextFormField(
+              controller: textEditingControllerMap[index],
+              onChanged: (value) {
+                setState(() {
+                  if (value.isNotEmpty) {
+                    List<String> currentResponses = (answers[index]?['response'] is List)
+                        ? List<String>.from(answers[index]?['response'])
+                        : [];
+                    currentResponses.add('Otro (Especifique): $value');
+
+                    answers[index] = {
+                      'dimension': category.dimension,
+                      'variable': category.variable,
+                      'category': category.name,
+                      'question': question.text,
+                      'response': currentResponses,
+                      'score': question.options.firstWhere(
+                              (opt) => opt.text == 'Otro (Especifique)',
+                              orElse: () => Option('', 0))
+                          .score,
+                      'maxScore': question.totalScore,
+                    };
+                  } else {
+                    answers[index]?['response'] = answers[index]?['response'] is List
+                        ? (answers[index]?['response'] as List)
+                            .where((response) => !response.startsWith('Otro (Especifique):'))
+                            .toList()
+                        : '';
+                  }
+                });
+              },
+              decoration: InputDecoration(hintText: 'Ingrese otro valor'),
+            ),
           ),
-        ],
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
+
+
+
+
 
   int calculateScore(Question question, List<String> selectedOptions) {
     // Implementa la lógica para calcular el puntaje según las opciones seleccionadas

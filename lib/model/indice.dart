@@ -130,7 +130,7 @@ List<Category> categories_data = [
             Option('Régimen Especial de Impuesto a la Renta (RER)', 2),
             Option('Régimen MYPE Tributario (RMT)', 3),
             Option('Régimen General', 4),
-            Option('Ninguno', 0),
+            Option('Ninguna de las anteriores', 0),
           ],
           0,
           true,
@@ -817,7 +817,7 @@ List<Category> categories_data = [
           Option('Máquina de tejer Galga 3', 0),
           Option('Máquina de tejer Galga 6', 0),
           Option('Máquina de tejer Galga 8', 0),
-          Option('Ninguna', 0),
+          Option('Ninguna de las anteriores', 0),
         ],
         0,
         true,
@@ -829,8 +829,9 @@ List<Category> categories_data = [
         [
           Option('Silver', 0),
           Option('Brother', 0),
-          Option('Ninguna', 0),
+          
           Option('Otro (Especifique)', 0),
+          Option('Ninguna de las anteriores', 0),
         ],
         0,
         true,
@@ -854,8 +855,9 @@ List<Category> categories_data = [
         [
           Option('Singer', 0),
           Option('Longxing', 0),
-          Option('Ninguna', 0),
+          
           Option('Otro (Especifique)', 0),
+          Option('Ninguna de las anteriores', 0),
         ],
         0,
         true,
@@ -917,7 +919,7 @@ List<Category> categories_data = [
           Option('Muestra de orientación', 1),
           Option('Fórmula de conversión', 1),
           Option('Desarrollo de hojas de trabajo', 1),
-          Option('Ninguna', 0),
+          Option('Ninguna de las anteriores', 0),
           Option('Todas las anteriores', 2),
         ],
         1,
@@ -934,7 +936,7 @@ List<Category> categories_data = [
           Option('Deslizado', 1),
           Option('Calado', 1),
           Option('Intarsia', 1),
-          Option('Ninguna', 0),
+          Option('Ninguna de las anteriores', 0),
         ],
         1,
         true,
@@ -959,8 +961,9 @@ List<Category> categories_data = [
         [
           Option('Costura', 1),
           Option('Remallado', 1),
-          Option('Ninguna', 0),
+          
           Option('Costura y Remallado', 3),
+          Option('Ninguna de las anteriores', 0),
         ],
         0,
         true,
@@ -1207,7 +1210,7 @@ List<Category> categories_data = [
           ],
           1,
           false,
-          3,
+          3,  
           0),
     ],
   ),
@@ -1573,7 +1576,7 @@ List<Category> categories_data = [
       Question(
           '¿Qué canales utiliza actualmente para promocionar y vender sus productos textiles?',
           [
-            Option('Presencial (tiendas físicas)', 0),
+            Option('Presencial (ferias, y tiendas físicas)', 0),
             Option('Digital (Redes sociales, market place, ecommerce)', 1),
           ],
           0,
@@ -1581,7 +1584,7 @@ List<Category> categories_data = [
           0,
           1),
       Question(
-          '¿Qué canales utiliza actualmente para promocionar y vender sus productos textiles?',
+          '¿Qué canales presenciales utiliza actualmente para promocionar y vender sus productos textiles?',
           [
             Option('Venta directa en ferias locales', 1),
             Option('Venta directa en ferias regionales', 1),
@@ -1654,7 +1657,7 @@ List<Category> categories_data = [
             Option('Ferias y eventos locales', 1),
             Option('Tienda física propia', 2),
             Option('Otros (especificar)', 1),
-            Option('Ninguna', 0),
+            Option('Ninguna de las anteriores', 0),
           ],
           1,
           true,
@@ -1707,7 +1710,7 @@ List<Category> categories_data = [
           0,
           2),
       Question(
-          '¿Qué tipo de herramienta de Marketing utiliza?',
+          '¿Qué tipo de herramienta de Marketing utiliza? (Selección múltiple)',
           [
             Option('CRM', 2),
             Option('Gestor de contenido', 2),
@@ -1715,6 +1718,7 @@ List<Category> categories_data = [
             Option('Mailing o correos electrónicos', 2),
             Option('Administrador de anuncios', 2),
             Option('Otro (Especifique)', 1),
+             Option('Ninguna de las anteriores', 0),
           ],
           1,
           true,
@@ -1732,6 +1736,7 @@ List<Category> categories_data = [
             Option('Marketing con influencers', 3),
             Option('Paginas web', 2),
             Option('Otro (Especifique)', 1),
+            Option('Ninguna de las anteriores', 0),
           ],
           1,
           true,
@@ -1803,7 +1808,7 @@ List<Category> categories_data = [
           0,
           1),
       Question(
-          'Cuenta con pasarela de pagos',
+          '¿Cuenta con Pasarela de Pagos? ',
           [
             Option('Si', 1),
             Option('No', 0),
@@ -1822,8 +1827,8 @@ List<Category> categories_data = [
             Option('Niubiz', 1),
           ],
           1,
-          true,
-          0,
+          false,
+          1,
           3),
       Question(
           '¿Cuenta con una tienda virtual (tienda virtual de ventas)?',
@@ -1843,7 +1848,7 @@ List<Category> categories_data = [
     'Gestión de Finanzas',
     [
       Question(
-          '¿Alguna vez accedio a un crédito financiero?',
+          '¿Alguna vez accedió a un crédito financiero?',
           [
             Option('Si', 1),
             Option('No', 0),
@@ -2111,15 +2116,15 @@ List<Category> categories_data = [
           '¿Conoce qué impuestos deben pagar todas las empresas en Perú, independientemente del régimen tributario?',
           [
             Option(
-                'a) Impuesto a la Renta y Contribución al Seguro Social de Salud (ESSALUD).',
+                'Impuesto a la Renta y Contribución al Seguro Social de Salud (ESSALUD).',
                 1),
             Option(
-                'b) Impuesto General a las Ventas (IGV) y Contribución al Seguro Social de Salud (ESSALUD).',
+                'Impuesto General a las Ventas (IGV) y Contribución al Seguro Social de Salud (ESSALUD).',
                 0),
             Option(
-                'c) Impuesto a los Activos Financieros (IAF) y Contribución al Seguro Social de Salud (ESSALUD).',
+                'Impuesto a los Activos Financieros (IAF) y Contribución al Seguro Social de Salud (ESSALUD).',
                 0),
-            Option('d) Ninguna de las anteriores.', 0),
+            Option('Ninguna de las anteriores', 0),
           ],
           0,
           true,
@@ -2327,8 +2332,8 @@ List<Category> categories_data = [
             Option('1 vez al año', 1),
           ],
           0,
-          true,
-          0,
+          false,
+          1,
           4),
     ],
   ),
@@ -2411,7 +2416,7 @@ List<Category> categories_data = [
             Option(
                 'Cuidar los recursos naturales como el agua y los bosques.', 1),
             Option('No estoy seguro/a de lo que significa', 0),
-            Option('Otra respuesta (especificar).', 1),
+            Option('Otro (especificar)', 1),
           ],
           0,
           true,
@@ -2420,11 +2425,11 @@ List<Category> categories_data = [
       Question(
           '¿Qué prácticas realiza su hogar o con su actividad económica para cuidar el medio ambiente?',
           [
-            Option('a) Separamos los residuos sólidos para su reciclaje.', 1),
-            Option('b) Reutilizamos materiales en la fabricación de productos.',
+            Option('Separamos los residuos sólidos para su reciclaje.', 1),
+            Option('Reutilizamos materiales en la fabricación de productos.',
                 1),
-            Option('c) Reducimos el consumo de agua y energía.', 1),
-            Option('d) Ninguna de las anteriores.', 0),
+            Option('Reducimos el consumo de agua y energía.', 1),
+            Option('Ninguna de las anteriores', 0),
           ],
           0,
           true,
@@ -2461,8 +2466,8 @@ List<Category> categories_data = [
             Option('Teñido natural con plantas y minerales locales/ de la zona',
                 1),
             Option('Uso de técnicas de tejido tradicional (Away, telar)', 1),
-            Option('Otros (especificar)', 1),
             Option('No utilizo ninguna técnica ancestral', 0),
+            Option('Otro (especificar)', 1),
           ],
           1,
           true,
@@ -2503,11 +2508,11 @@ List<Category> categories_data = [
       Question(
           '¿Qué prácticas realiza su asociación para cuidar el medio ambiente?',
           [
-            Option('a) Separamos los residuos sólidos para su reciclaje.', 1),
-            Option('b) Reutilizamos materiales en la fabricación de productos.',
+            Option('Separamos los residuos sólidos para su reciclaje.', 1),
+            Option('Reutilizamos materiales en la fabricación de productos.',
                 1),
-            Option('c) Reducimos el consumo de agua y energía.', 1),
-            Option('d) Ninguna de las anteriores.', 0),
+            Option('Reducimos el consumo de agua y energía.', 1),
+            Option('Ninguna de las anteriores', 0),
           ],
           1,
           false,
@@ -2610,7 +2615,7 @@ List<Category> categories_data = [
                 'Organización de eventos educativos y charlas sobre el impacto ambiental de la industria textil',
                 1),
             Option('Ofreciendo productos sostenibles', 1),
-            Option('Ninguna', 0),
+            Option('Ninguna de las anteriores', 0),
           ],
           1,
           false,
