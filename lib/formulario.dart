@@ -122,7 +122,7 @@ class _FormularioState extends State<Formulario> {
                     category.name == 'G. Ambiental Asociacion/Cooperativa') ||
                 (_selectedOrganization == 'Empresa ' &&
                     category.name == 'G. Ambiental Empresa')) {
-              queue.addLast(category);
+              selectedCategories.add(category);
             }
           }
           print('longitud de la cola antes de pasar a next: ${queue.length}');
@@ -131,7 +131,7 @@ class _FormularioState extends State<Formulario> {
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  NextForm(categories: queue, id: widget.id, name: widget.name,code: 0,globalAnswers: {},),
+                  NextForm(categories: selectedCategories, id: widget.id, name: widget.name,code: 0,globalAnswers: {},indexCategories: 0,used: {},),
             ),
           );
           print('Actividad seleccionada: $_selectedOrganization');

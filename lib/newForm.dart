@@ -11,18 +11,22 @@ import 'dart:collection';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NextForm extends StatefulWidget {
-  final Queue<Category> categories;
+  final List<Category> categories;
   final String id;
   final String name;
   final int code;
   final Map<int, Map<String, dynamic>> globalAnswers;
+  final int indexCategories;
+  final Set<Item> used;
   const NextForm(
       {super.key,
       required this.categories,
       required this.id,
       required this.name,
       required this.code,
-      required this.globalAnswers});
+      required this.globalAnswers,
+      required this.indexCategories,
+      required this.used});
 
   @override
   State<NextForm> createState() => _NextFormState();
@@ -40,7 +44,7 @@ class _NextFormState extends State<NextForm> {
       print(elemento.name);
     });
     if (widget.categories.isNotEmpty) {
-      category = widget.categories.removeFirst();
+      category = widget.categories[widget.indexCategories];
     } else {
       Navigator.pop(context); // No hay más categorías, regresar
     }
@@ -52,10 +56,12 @@ class _NextFormState extends State<NextForm> {
         textEditingControllerMap[i] = TextEditingController();
       }
     }
+    print(widget.indexCategories);
     print('despues');
     widget.categories.forEach((elemento) {
       print(elemento.name);
     });
+    print(widget.used);
   }
 
   @override
@@ -141,7 +147,7 @@ class _NextFormState extends State<NextForm> {
                     if (option == category.name &&
                         (category.name == 'Prendas Tejidas a Punto' ||
                             category.name == 'Peletería' ||
-                            category.name == 'Tejido plano en Telar' ||
+                            category.name == 'Tejido Plano en Telar' ||
                             category.name == 'Prendas' ||
                             category.name == 'Accesorios' ||
                             category.name == 'DecoHome' ||
@@ -155,7 +161,14 @@ class _NextFormState extends State<NextForm> {
                       if (category.name == 'Peletería') newCode = 2;
                       if (category.name == 'Tejido Plano en Telar') newCode = 3;
                       setState(() {
-                        widget.categories.addFirst(category);
+                        Item val = new Item(
+                            name: category.name,
+                            prevIndex: widget.indexCategories);
+                        if (!widget.used.contains(val)) {
+                          widget.categories
+                              .insert(widget.indexCategories + 1, category);
+                          widget.used.add(val);
+                        }
                       });
                     }
                   }
@@ -178,6 +191,8 @@ class _NextFormState extends State<NextForm> {
                       name: widget.name,
                       code: newCode != 0 ? newCode : widget.code,
                       globalAnswers: widget.globalAnswers,
+                      indexCategories: widget.indexCategories + 1,
+                      used: widget.used,
                     ),
                   ),
                 );
@@ -185,10 +200,11 @@ class _NextFormState extends State<NextForm> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Results(
+                    builder: (context) => new Results(
                       id: widget.id,
                       name: widget.name,
                       code: newCode != 0 ? newCode : widget.code,
+                      answeres: widget.globalAnswers,
                     ),
                   ),
                 );
@@ -329,7 +345,8 @@ class _NextFormState extends State<NextForm> {
               );
             }).toList(),
           ),
-          if (answers[index]?['response']?.split(':')[0] == 'Otro (Especifique)')
+          if (answers[index]?['response']?.split(':')[0] ==
+              'Otro (Especifique)')
             Padding(
               padding: const EdgeInsets.only(left: 42.0),
               child: TextFormField(
@@ -349,148 +366,164 @@ class _NextFormState extends State<NextForm> {
       ),
     );
   }
-Widget buildCheckboxListTile(Question question, int index) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(question.text),
-        Column(
-          children: question.options.map((option) {
-            bool isSelected = false;
-            if (answers[index]?['response'] is List) {
-              isSelected = (answers[index]?['response'] as List).contains(option.text);
-            } else if (answers[index]?['response'] is String) {
-              isSelected = answers[index]?['response'] == option.text;
-            }
 
-            return CheckboxListTile(
-              controlAffinity: ListTileControlAffinity.leading,
-              title: Text(option.text),
-              value: isSelected,
-              onChanged: (value) {
-                setState(() {
-                  List<String> selectedOptions;
+  Widget buildCheckboxListTile(Question question, int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(question.text),
+          Column(
+            children: question.options.map((option) {
+              bool isSelected = false;
+              if (answers[index]?['response'] is List) {
+                isSelected =
+                    (answers[index]?['response'] as List).contains(option.text);
+              } else if (answers[index]?['response'] is String) {
+                isSelected = answers[index]?['response'] == option.text;
+              }
 
-                  if (answers[index]?['response'] is List) {
-                    selectedOptions = List<String>.from(answers[index]?['response']);
-                  } else if (answers[index]?['response'] is String) {
-                    selectedOptions = [answers[index]?['response']];
-                  } else {
-                    selectedOptions = [];
-                  }
+              return CheckboxListTile(
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(option.text),
+                value: isSelected,
+                onChanged: (value) {
+                  setState(() {
+                    List<String> selectedOptions;
 
-                  if (value != null) {
-                    if (value) {
-                      if (option.text == 'Ninguna de las anteriores') {
-                        selectedOptions.clear();
-                        selectedOptions.add(option.text);
-                      } else if (option.text == 'Todas las anteriores') {
-                        selectedOptions.clear();
-                        selectedOptions.addAll(question.options
-                            .where((o) => o.text != 'Ninguna de las anteriores' && o.text != 'Otro (Especifique)')
-                            .map((o) => o.text));
+                    if (answers[index]?['response'] is List) {
+                      selectedOptions =
+                          List<String>.from(answers[index]?['response']);
+                    } else if (answers[index]?['response'] is String) {
+                      selectedOptions = [answers[index]?['response']];
+                    } else {
+                      selectedOptions = [];
+                    }
+
+                    if (value != null) {
+                      if (value) {
+                        if (option.text == 'Ninguna de las anteriores') {
+                          selectedOptions.clear();
+                          selectedOptions.add(option.text);
+                        } else if (option.text == 'Todas las anteriores') {
+                          selectedOptions.clear();
+                          selectedOptions.addAll(question.options
+                              .where((o) =>
+                                  o.text != 'Ninguna de las anteriores' &&
+                                  o.text != 'Otro (Especifique)')
+                              .map((o) => o.text));
+                        } else {
+                          selectedOptions.add(option.text);
+                          if (selectedOptions
+                              .contains('Ninguna de las anteriores')) {
+                            selectedOptions.remove('Ninguna de las anteriores');
+                          }
+                        }
                       } else {
-                        selectedOptions.add(option.text);
-                        if (selectedOptions.contains('Ninguna de las anteriores')) {
-                          selectedOptions.remove('Ninguna de las anteriores');
+                        selectedOptions.remove(option.text);
+                        if (option.text == 'Todas las anteriores') {
+                          selectedOptions.clear();
                         }
                       }
-                    } else {
-                      selectedOptions.remove(option.text);
-                      if (option.text == 'Todas las anteriores') {
-                        selectedOptions.clear();
+
+                      if (selectedOptions.contains('Todas las anteriores') &&
+                          selectedOptions.length <
+                              question.options.length - 1) {
+                        selectedOptions.remove('Todas las anteriores');
+                      }
+
+                      if (selectedOptions
+                              .contains('Ninguna de las anteriores') &&
+                          selectedOptions.length > 1) {
+                        selectedOptions.removeWhere((element) =>
+                            element != 'Ninguna de las anteriores');
+                      }
+
+                      int totalScore = selectedOptions
+                          .map((selectedOption) => question.options
+                              .firstWhere((opt) => opt.text == selectedOption,
+                                  orElse: () => Option('', 0))
+                              .score)
+                          .fold(0,
+                              (previousValue, score) => previousValue + score);
+
+                      answers[index] = {
+                        'dimension': category.dimension,
+                        'variable': category.variable,
+                        'category': category.name,
+                        'question': question.text,
+                        'response':
+                            selectedOptions.isNotEmpty ? selectedOptions : '',
+                        'score': min(totalScore, question.totalScore),
+                        'maxScore': question.totalScore,
+                      };
+
+                      if (selectedOptions.contains('Otros (Especifique)') &&
+                          !textEditingControllerMap.containsKey(index)) {
+                        textEditingControllerMap[index] =
+                            TextEditingController();
+                      } else if (!selectedOptions
+                          .contains('Otros (Especifique)')) {
+                        textEditingControllerMap[index]?.dispose();
+                        textEditingControllerMap.remove(index);
                       }
                     }
-
-                    if (selectedOptions.contains('Todas las anteriores') &&
-                        selectedOptions.length < question.options.length - 1) {
-                      selectedOptions.remove('Todas las anteriores');
-                    }
-
-                    if (selectedOptions.contains('Ninguna de las anteriores') &&
-                        selectedOptions.length > 1) {
-                      selectedOptions.removeWhere((element) => element != 'Ninguna de las anteriores');
-                    }
-
-                    int totalScore = selectedOptions
-                        .map((selectedOption) => question.options
-                            .firstWhere((opt) => opt.text == selectedOption,
-                                orElse: () => Option('', 0))
-                            .score)
-                        .fold(0, (previousValue, score) => previousValue + score);
-
-                    answers[index] = {
-                      'dimension': category.dimension,
-                      'variable': category.variable,
-                      'category': category.name,
-                      'question': question.text,
-                      'response': selectedOptions.isNotEmpty ? selectedOptions : '',
-                      'score': min(totalScore, question.totalScore),
-                      'maxScore': question.totalScore,
-                    };
-
-                    if (selectedOptions.contains('Otro (Especifique)') && 
-                        !textEditingControllerMap.containsKey(index)) {
-                      textEditingControllerMap[index] = TextEditingController();
-                    } else if (!selectedOptions.contains('Otro (Especifique)')) {
-                      textEditingControllerMap[index]?.dispose();
-                      textEditingControllerMap.remove(index);
-                    }
-                  }
-                });
-              },
-            );
-          }).toList(),
-        ),
-        if ((answers[index]?['response'] is List &&
-                (answers[index]?['response'] as List).contains('Otro (Especifique)')) ||
-            (answers[index]?['response'] is String && (answers[index]?['response'] as String).startsWith('Otro (Especifique)')))
-          Padding(
-            padding: const EdgeInsets.only(left: 42.0),
-            child: TextFormField(
-              controller: textEditingControllerMap[index],
-              onChanged: (value) {
-                setState(() {
-                  if (value.isNotEmpty) {
-                    List<String> currentResponses = (answers[index]?['response'] is List)
-                        ? List<String>.from(answers[index]?['response'])
-                        : [];
-                    currentResponses.add('Otro (Especifique): $value');
-
-                    answers[index] = {
-                      'dimension': category.dimension,
-                      'variable': category.variable,
-                      'category': category.name,
-                      'question': question.text,
-                      'response': currentResponses,
-                      'score': question.options.firstWhere(
-                              (opt) => opt.text == 'Otro (Especifique)',
-                              orElse: () => Option('', 0))
-                          .score,
-                      'maxScore': question.totalScore,
-                    };
-                  } else {
-                    answers[index]?['response'] = answers[index]?['response'] is List
-                        ? (answers[index]?['response'] as List)
-                            .where((response) => !response.startsWith('Otro (Especifique):'))
-                            .toList()
-                        : '';
-                  }
-                });
-              },
-              decoration: InputDecoration(hintText: 'Ingrese otro valor'),
-            ),
+                  });
+                },
+              );
+            }).toList(),
           ),
-      ],
-    ),
-  );
-}
+          if ((answers[index]?['response'] is List &&
+                  (answers[index]?['response'] as List)
+                      .contains('Otros (Especifique)')) ||
+              (answers[index]?['response'] is String &&
+                  (answers[index]?['response'] as String)
+                      .startsWith('Otros (Especifique)')))
+            Padding(
+              padding: const EdgeInsets.only(left: 42.0),
+              child: TextFormField(
+                controller: textEditingControllerMap[index],
+                onChanged: (value) {
+                  setState(() {
+                    if (value.isNotEmpty) {
+                      List<String> currentResponses =
+                          (answers[index]?['response'] is List)
+                              ? List<String>.from(answers[index]?['response'])
+                              : [];
+                      currentResponses.add('Otros (Especifique): $value');
 
-
-
-
+                      answers[index] = {
+                        'dimension': category.dimension,
+                        'variable': category.variable,
+                        'category': category.name,
+                        'question': question.text,
+                        'response': currentResponses,
+                        'score': question.options
+                            .firstWhere(
+                                (opt) => opt.text == 'Otros (Especifique)',
+                                orElse: () => Option('', 0))
+                            .score,
+                        'maxScore': question.totalScore,
+                      };
+                    } else {
+                      answers[index]?['response'] = answers[index]?['response']
+                              is List
+                          ? (answers[index]?['response'] as List)
+                              .where((response) =>
+                                  !response.startsWith('Otros (Especifique):'))
+                              .toList()
+                          : '';
+                    }
+                  });
+                },
+                decoration: InputDecoration(hintText: 'Ingrese otro valor'),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 
   int calculateScore(Question question, List<String> selectedOptions) {
     // Implementa la lógica para calcular el puntaje según las opciones seleccionadas
@@ -532,4 +565,10 @@ Widget buildCheckboxListTile(Question question, int index) {
       ),
     );
   }
+}
+
+class Item {
+  String name;
+  int prevIndex;
+  Item({required this.name, required this.prevIndex});
 }

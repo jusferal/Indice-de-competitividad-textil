@@ -14,9 +14,9 @@ class Results extends StatefulWidget {
   final String id;
   final String name;
   final int code;
-
+  final Map<int, Map<String, dynamic>> answeres;
   const Results(
-      {super.key, required this.id, required this.name, required this.code});
+      {super.key, required this.id, required this.name, required this.code, required this.answeres});
   @override
   State<Results> createState() => _ResultsState();
 }
@@ -565,7 +565,8 @@ class _TableDState extends State<TableD> {
       tableData[i][3] = '${porcentaje.toStringAsFixed(2)}%';
     }
   }
- bool isPercentage(String value) {
+
+  bool isPercentage(String value) {
     final percentageRegExp = RegExp(r'^\d{1,3}(\.\d+)?%$');
     return percentageRegExp.hasMatch(value);
   }
@@ -576,11 +577,12 @@ class _TableDState extends State<TableD> {
       if (percentage < 50.0) {
         return Colors.red;
       } else {
-        return Colors.green;
+        return Color.fromARGB(255, 50, 214, 55);
       }
     }
     return Colors.transparent;
   }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -632,15 +634,13 @@ class _TableDState extends State<TableD> {
                 TableCell(
                   verticalAlignment: TableCellVerticalAlignment.fill,
                   child: Container(
-                    color: Colors.yellow[300],
+                    color: Colors.yellow,
                     alignment: Alignment.center,
-                    height: 200,
                     child: RotatedBox(
                       quarterTurns: 3,
-                      child: Text(
-                        'Interno',
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Text('Interno',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ),
@@ -658,7 +658,8 @@ class _TableDState extends State<TableD> {
                             children: row.map(
                               (cell) {
                                 return TableCell(
-                                  verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
+                                  verticalAlignment: TableCellVerticalAlignment
+                                      .intrinsicHeight,
                                   child: Container(
                                     alignment: Alignment.center,
                                     padding: const EdgeInsets.all(2.0),
@@ -666,7 +667,7 @@ class _TableDState extends State<TableD> {
                                     child: Text(
                                       cell,
                                       softWrap: true,
-                                      maxLines: 2,
+                                      maxLines: 3,
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
@@ -685,13 +686,12 @@ class _TableDState extends State<TableD> {
                   verticalAlignment: TableCellVerticalAlignment.fill,
                   child: Container(
                     alignment: Alignment.center,
-                    color: Color.fromARGB(255, 39, 147, 197),
+                    color: Color.fromARGB(255, 55, 212, 212),
                     child: RotatedBox(
                       quarterTurns: 3,
-                      child: Text(
-                        'Externo',
-                        textAlign: TextAlign.center,
-                      ),
+                      child: Text('Externo',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ),
@@ -709,7 +709,8 @@ class _TableDState extends State<TableD> {
                             children: row.map(
                               (cell) {
                                 return TableCell(
-                                  verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
+                                  verticalAlignment: TableCellVerticalAlignment
+                                      .intrinsicHeight,
                                   child: Container(
                                     alignment: Alignment.center,
                                     padding: const EdgeInsets.all(2.0),
@@ -718,7 +719,7 @@ class _TableDState extends State<TableD> {
                                       child: Text(
                                         cell,
                                         softWrap: true,
-                                        maxLines: 2,
+                                        maxLines: 3,
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
