@@ -164,6 +164,11 @@ class _NextFormState extends State<NextForm> {
                         Item val = new Item(
                             name: category.name,
                             prevIndex: widget.indexCategories);
+                        Set<String> values = {};
+                        widget.used.forEach((element) {
+                          if (element.prevIndex == widget.indexCategories)
+                            values.add(element.name);
+                        });
                         if (!widget.used.contains(val)) {
                           widget.categories
                               .insert(widget.indexCategories + 1, category);
