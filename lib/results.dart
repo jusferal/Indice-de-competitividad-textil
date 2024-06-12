@@ -3,12 +3,19 @@ import 'dart:math';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
 import 'package:ict/roadmap.dart';
 import 'package:kg_charts/kg_charts.dart';
+import 'package:printing/printing.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:pdf/pdf.dart' as pdfLib;
+import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class Results extends StatefulWidget {
   final String id;
@@ -16,7 +23,11 @@ class Results extends StatefulWidget {
   final int code;
   final Map<int, Map<String, dynamic>> answeres;
   const Results(
-      {super.key, required this.id, required this.name, required this.code, required this.answeres});
+      {super.key,
+      required this.id,
+      required this.name,
+      required this.code,
+      required this.answeres});
   @override
   State<Results> createState() => _ResultsState();
 }
@@ -94,6 +105,41 @@ class _ResultsState extends State<Results> {
     print("puntaje maximo es: $puntajeMaximo");
     print("es::::::::::::::");
     print(puntajeDimension.map((e) => e.toDouble()).toList());
+  }
+
+  Future<void> _generatePDF() async {
+    final pdf = pdfWidgets.Document();
+    final font = await PdfGoogleFonts.nunitoExtraLight();
+   // Añadir las respuestas al PDF
+    widget.answeres.forEach((index, answer) {
+      final question = answer['question'];
+      final response = answer['response'];
+      pdf.addPage(pdfWidgets.Page(
+        build: (context) => pdfWidgets.Column(
+          crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+          children: [
+            pdfWidgets.Text('Pregunta: $question',
+                style: pdfWidgets.TextStyle(font: font)),
+            pdfWidgets.SizedBox(height: 5),
+            pdfWidgets.Text('Respuesta: $response'),
+            pdfWidgets.SizedBox(height: 15),
+          ],
+        ),
+      ));
+    });
+
+    String? outputPath = await FilePicker.platform.saveFile(
+      dialogTitle: 'Save PDF to...',
+      fileName: 'example.pdf',
+    );
+
+    if (outputPath != null) {
+      final file = File(outputPath);
+      await file.writeAsBytes(await pdf.save());
+      print('PDF saved to $outputPath');
+    } else {
+      print('User canceled the picker');
+    }
   }
 
   @override
@@ -276,6 +322,10 @@ class _ResultsState extends State<Results> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _generatePDF,
+                    child: Text('Generar PDFff'),
                   ),
                 ],
               ),

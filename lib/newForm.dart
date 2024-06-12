@@ -129,10 +129,12 @@ class _NextFormState extends State<NextForm> {
           onPressed: () async {
             if (allQuestionsAnswered()) {
               print('comenzand');
+
               int newCode = 0;
               for (var i = 0; i < category.questions.length; i++) {
                 if (category.questions[i].behavior != 2 &&
                     category.questions[i].behavior != 3) continue;
+                if (!answers.containsKey(i)) continue;
                 for (Category category in categories_data) {
                   print(answers[i]?['response']);
                   final options;
@@ -166,8 +168,10 @@ class _NextFormState extends State<NextForm> {
                             prevIndex: widget.indexCategories);
                         Set<String> values = {};
                         widget.used.forEach((element) {
-                          if (element.prevIndex == widget.indexCategories)
+                          if (element.prevIndex == widget.indexCategories) {
                             values.add(element.name);
+                            widget.used.remove(element);
+                          }
                         });
                         if (!widget.used.contains(val)) {
                           widget.categories
@@ -186,7 +190,9 @@ class _NextFormState extends State<NextForm> {
               });
               await saveDataToSupabase();
               saveAnswers();
-              if (widget.categories.length != 0) {
+              print(
+                  'lens: ${widget.indexCategories} ${widget.categories.length}');
+              if (widget.indexCategories + 1 < widget.categories.length) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
