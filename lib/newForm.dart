@@ -39,9 +39,9 @@ class _NextFormState extends State<NextForm> {
   @override
   void initState() {
     super.initState();
-    print('antes/');
-    widget.categories.forEach((elemento) {
-      print(elemento.name);
+    print('respuestas');
+    widget.globalAnswers.forEach((index, answer) {
+      print(answer);
     });
     if (widget.categories.isNotEmpty) {
       category = widget.categories[widget.indexCategories];
@@ -61,7 +61,7 @@ class _NextFormState extends State<NextForm> {
     widget.categories.forEach((elemento) {
       print(elemento.name);
     });
-     widget.used.forEach((elemento) {
+    widget.used.forEach((elemento) {
       print(elemento.name);
     });
   }
@@ -165,7 +165,7 @@ class _NextFormState extends State<NextForm> {
                     if (categoriesMap.containsKey('Peletería')) newCode = 2;
                     if (categoriesMap.containsKey('Tejido Plano en Telar'))
                       newCode = 3;
-                      
+
                     setState(() {
                       print('------------------- $option');
                       Item val = new Item(
@@ -178,8 +178,8 @@ class _NextFormState extends State<NextForm> {
                         }
                       });
                       if (!widget.used.contains(val)) {
-                        widget.categories
-                            .insert(widget.indexCategories + 1, categoriesMap[option]!);
+                        widget.categories.insert(
+                            widget.indexCategories + 1, categoriesMap[option]!);
                         widget.used.add(val);
                       }
                     });
@@ -334,7 +334,7 @@ class _NextFormState extends State<NextForm> {
                         }
                       }
                     }
-                    if (value == 'Presencial (tiendas físicas)') {
+                    if (value == 'Presencial (ferias, y tiendas físicas)') {
                       category.questions[index + 1].isVisible = true;
                       category.questions[index + 2].isVisible = false;
                     } else if (value ==

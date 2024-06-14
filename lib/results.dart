@@ -1,17 +1,19 @@
 import 'dart:math';
-
+import 'dart:ui' as ui;
+import 'dart:typed_data';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_radar_chart/flutter_radar_chart.dart';
 import 'package:ict/roadmap.dart';
 import 'package:kg_charts/kg_charts.dart';
+import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:pdf/pdf.dart' as pdfLib;
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -53,6 +55,8 @@ class _ResultsState extends State<Results> {
   ];
   List<int> puntajeDimension = List.filled(14, 0); // Rellena la lista con 0s
   List<int> puntajeDimensionMax = List.filled(14, 0);
+  final GlobalKey _globalKey1 = GlobalKey();
+  final GlobalKey _globalKey2 = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -109,29 +113,191 @@ class _ResultsState extends State<Results> {
 
   Future<void> _generatePDF() async {
     final pdf = pdfWidgets.Document();
-    //final font = await PdfGoogleFonts.nunitoExtraLight();
-    // Añadir las respuestas al PDF
     print(widget.answeres);
+    // Verificar que los datos estén presentes
+    if (widget.answeres == null || widget.answeres.isEmpty) {
+      print('No hay datos para generar el PDF.');
+      return;
+    }
+
+    // Agrupar las preguntas por categoría
+    Map<String, List<Map<String, dynamic>>> groupedAnswers = {};
+
     widget.answeres.forEach((index, answer) {
-      final question = answer['question'];
-      final response = answer['response'];
-      print('$index: $question -> $response');
-      pdf.addPage(pdfWidgets.Page(
-        build: (context) {
-          return pdfWidgets.Column(
-            crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-            children: [
-              pdfWidgets.Text(
-                'Pregunta: $question',
-              ),
-              pdfWidgets.SizedBox(height: 5),
-              pdfWidgets.Text('Respuesta: $response'),
-              pdfWidgets.SizedBox(height: 15),
-            ],
-          );
-        },
-      ));
+      final category = answer['category'];
+      if (!groupedAnswers.containsKey(category)) {
+        groupedAnswers[category] = [];
+      }
+      groupedAnswers[category]?.add(answer);
     });
+
+    // Lista para almacenar todos los widgets
+    final content = <pdfWidgets.Widget>[];
+    content.add(
+      pdfWidgets.Center(
+        child: pdfWidgets.Text(
+          'Hoja de Respuestas',
+          style: pdfWidgets.TextStyle(
+            fontSize: 24,
+            fontWeight: pdfWidgets.FontWeight.bold,
+            color: PdfColors.purple,
+          ),
+        ),
+      ),
+    );
+    content.add(pdfWidgets.Container(
+        margin: pdfWidgets.EdgeInsets.symmetric(vertical: 20),
+        padding: pdfWidgets.EdgeInsets.all(10),
+        color: PdfColors.white,
+        child: pdfWidgets.Row(
+            mainAxisAlignment: pdfWidgets.MainAxisAlignment.spaceBetween,
+            children: [
+              pdfWidgets.Column(
+                crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+                children: [
+                  pdfWidgets.RichText(
+                    text: pdfWidgets.TextSpan(
+                      children: [
+                        pdfWidgets.TextSpan(
+                          text: 'NOMBRES: ',
+                          style: pdfWidgets.TextStyle(
+                            fontSize: 12,
+                            fontWeight: pdfWidgets.FontWeight.bold,
+                            color: PdfColors.black,
+                          ),
+                        ),
+                        pdfWidgets.TextSpan(
+                          text: widget.name,
+                          style: pdfWidgets.TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pdfWidgets.SizedBox(height: 5),
+                  pdfWidgets.RichText(
+                    text: pdfWidgets.TextSpan(
+                      children: [
+                        pdfWidgets.TextSpan(
+                          text: 'RUC/DNI: ',
+                          style: pdfWidgets.TextStyle(
+                            fontSize: 12,
+                            fontWeight: pdfWidgets.FontWeight.bold,
+                            color: PdfColors.black,
+                          ),
+                        ),
+                        pdfWidgets.TextSpan(
+                          text: widget.name,
+                          style: pdfWidgets.TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              pdfWidgets.Column(
+                crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+                children: [
+                  pdfWidgets.RichText(
+                    text: pdfWidgets.TextSpan(
+                      children: [
+                        pdfWidgets.TextSpan(
+                          text: 'ACTIVIDAD: ',
+                          style: pdfWidgets.TextStyle(
+                            fontSize: 12,
+                            fontWeight: pdfWidgets.FontWeight.bold,
+                            color: PdfColors.black,
+                          ),
+                        ),
+                        pdfWidgets.TextSpan(
+                          text: widget.name,
+                          style: pdfWidgets.TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  pdfWidgets.SizedBox(height: 5),
+                  pdfWidgets.RichText(
+                    text: pdfWidgets.TextSpan(
+                      children: [
+                        pdfWidgets.TextSpan(
+                          text: 'TIPO DE ORGANIZACIÓN: ',
+                          style: pdfWidgets.TextStyle(
+                            fontSize: 12,
+                            fontWeight: pdfWidgets.FontWeight.bold,
+                            color: PdfColors.black,
+                          ),
+                        ),
+                        pdfWidgets.TextSpan(
+                          text: '${widget.name} cuando sea vomos',
+                          style: pdfWidgets.TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ])));
+    int numQuestion = 0;
+    groupedAnswers.forEach((category, answers) {
+      // Añadir el encabezado de la categoría
+      content.add(pdfWidgets.Header(
+        level: 1,
+        text: category,
+        textStyle: pdfWidgets.TextStyle(
+          fontSize: 18,
+          fontWeight: pdfWidgets.FontWeight.bold,
+          color: PdfColors.blueAccent,
+        ),
+      ));
+
+      answers.forEach((answer) {
+        final question = answer['question'];
+        final response = answer['response'];
+        numQuestion += 1;
+        // Añadir la pregunta al contenido
+        content.add(pdfWidgets.Text(
+          '${numQuestion}.- $question',
+          style: pdfWidgets.TextStyle(
+            fontSize: 14,
+            fontWeight: pdfWidgets.FontWeight.bold,
+          ),
+        ));
+        content.add(pdfWidgets.SizedBox(height: 5));
+
+        // Añadir la respuesta o las respuestas al contenido
+        if (response is String) {
+          content.add(
+            pdfWidgets.Bullet(
+              text: response,
+              style: pdfWidgets.TextStyle(
+                fontSize: 12,
+              ),
+            ),
+          );
+        } else if (response is List<String>) {
+          response.forEach((resp) {
+            content.add(
+              pdfWidgets.Bullet(
+                text: resp,
+                style: pdfWidgets.TextStyle(
+                  fontSize: 12,
+                ),
+              ),
+            );
+          });
+        }
+        content.add(pdfWidgets.SizedBox(height: 15));
+      });
+    });
+
+    // Añadir todo el contenido a una sola página o a múltiples páginas si es necesario
+    pdf.addPage(
+      pdfWidgets.MultiPage(
+        build: (context) => content,
+        margin: pdfWidgets.EdgeInsets.all(
+            20), // Ajuste de márgenes según sea necesario
+      ),
+    );
 
     String? outputPath = await FilePicker.platform.saveFile(
       dialogTitle: 'Save PDF to...',
@@ -140,11 +306,206 @@ class _ResultsState extends State<Results> {
 
     if (outputPath != null) {
       final file = File(outputPath);
-      await file.writeAsBytes(await pdf.save());
-      print('PDF saved to $outputPath');
+      try {
+        final bytes = await pdf.save();
+        print('Tamaño del PDF en bytes: ${bytes.length}');
+        await file.writeAsBytes(bytes);
+        print('PDF saved to $outputPath');
+      } catch (e, stackTrace) {
+        print('Error saving PDF: $e');
+        print('Stack Trace: $stackTrace');
+      }
     } else {
       print('User canceled the picker');
     }
+  }
+
+  Future<Uint8List> _capturePng(GlobalKey key) async {
+    try {
+      RenderRepaintBoundary boundary =
+          key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      return byteData!.buffer.asUint8List();
+    } catch (e) {
+      print(e);
+      return Uint8List(0);
+    }
+  }
+
+  Future<Uint8List> _loadHeaderImage() async {
+    final ByteData data = await rootBundle.load('assets/images/header.png');
+    return data.buffer.asUint8List();
+  }
+
+  // Función para generar el PDF con todas las imágenes de gráficos capturadas
+  Future<void> _generatePDFWithGraphs(
+      List<Uint8List> images, Uint8List headerImageBytes) async {
+    final pdf = pdfWidgets.Document();
+    final headerImage = pdfWidgets.MemoryImage(headerImageBytes);
+
+    pdf.addPage(
+      pdfWidgets.MultiPage(
+        margin: pdfWidgets.EdgeInsets.all(
+            0), // Margen a cero para mantener la imagen lo más arriba posible
+        header: (context) {
+          return pdfWidgets.Container(
+            alignment: pdfWidgets.Alignment.topCenter,
+            child: pdfWidgets.Image(
+              headerImage,
+              fit: pdfWidgets.BoxFit.contain,
+              width: PdfPageFormat
+                  .a4.width, // Ajusta el ancho al máximo de la página A4
+              height: PdfPageFormat.a4.height *
+                  0.1, // Ajusta la altura al 10% de la página A4
+            ),
+          );
+        },
+        build: (context) => [
+          // Agregar el contenido detallado
+          pdfWidgets.Container(
+            margin: pdfWidgets.EdgeInsets.symmetric(vertical: 20),
+            padding: pdfWidgets.EdgeInsets.all(10),
+            child: pdfWidgets.Row(
+              mainAxisAlignment: pdfWidgets.MainAxisAlignment.spaceBetween,
+              children: [
+                pdfWidgets.Column(
+                  crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+                  children: [
+                    pdfWidgets.RichText(
+                      text: pdfWidgets.TextSpan(
+                        children: [
+                          pdfWidgets.TextSpan(
+                            text: 'NOMBRES: ',
+                            style: pdfWidgets.TextStyle(
+                              fontSize: 12,
+                              fontWeight: pdfWidgets.FontWeight.bold,
+                              color: PdfColors.black,
+                            ),
+                          ),
+                          pdfWidgets.TextSpan(
+                            text: widget.name,
+                            style: pdfWidgets.TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    pdfWidgets.SizedBox(height: 5),
+                    pdfWidgets.RichText(
+                      text: pdfWidgets.TextSpan(
+                        children: [
+                          pdfWidgets.TextSpan(
+                            text: 'RUC/DNI: ',
+                            style: pdfWidgets.TextStyle(
+                              fontSize: 12,
+                              fontWeight: pdfWidgets.FontWeight.bold,
+                              color: PdfColors.black,
+                            ),
+                          ),
+                          pdfWidgets.TextSpan(
+                            text: widget.name,
+                            style: pdfWidgets.TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                pdfWidgets.Column(
+                  crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+                  children: [
+                    pdfWidgets.RichText(
+                      text: pdfWidgets.TextSpan(
+                        children: [
+                          pdfWidgets.TextSpan(
+                            text: 'ACTIVIDAD: ',
+                            style: pdfWidgets.TextStyle(
+                              fontSize: 12,
+                              fontWeight: pdfWidgets.FontWeight.bold,
+                              color: PdfColors.black,
+                            ),
+                          ),
+                          pdfWidgets.TextSpan(
+                            text: widget.name,
+                            style: pdfWidgets.TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                    pdfWidgets.SizedBox(height: 5),
+                    pdfWidgets.RichText(
+                      text: pdfWidgets.TextSpan(
+                        children: [
+                          pdfWidgets.TextSpan(
+                            text: 'TIPO DE ORGANIZACIÓN: ',
+                            style: pdfWidgets.TextStyle(
+                              fontSize: 12,
+                              fontWeight: pdfWidgets.FontWeight.bold,
+                              color: PdfColors.black,
+                            ),
+                          ),
+                          pdfWidgets.TextSpan(
+                            text: widget.name,
+                            style: pdfWidgets.TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Agregar las imágenes de los gráficos
+          ...images.map((imageBytes) {
+            final pdfImage = pdfWidgets.MemoryImage(imageBytes);
+            return pdfWidgets.Center(
+              child: pdfWidgets.Image(
+                pdfImage,
+                width: PdfPageFormat.a4.width *
+                    1.8, // Ajusta el ancho al 80% de la página A4
+                height: PdfPageFormat.a4.height *
+                    1.5, // Ajusta la altura al 40% de la página A4
+                fit: pdfWidgets.BoxFit.contain, // Ajusta el ajuste de la imagen
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+
+    String? outputPath = await FilePicker.platform.saveFile(
+      dialogTitle: 'Save PDF to...',
+      fileName: 'charts.pdf',
+    );
+
+    if (outputPath != null) {
+      final file = File(outputPath);
+      try {
+        final bytes = await pdf.save();
+        await file.writeAsBytes(bytes);
+        print('PDF saved to $outputPath');
+      } catch (e, stackTrace) {
+        print('Error saving PDF: $e');
+        print('Stack Trace: $stackTrace');
+      }
+    } else {
+      print('User canceled the picker');
+    }
+  }
+
+  // Capturar y generar el PDF con todos los gráficos
+  void _captureAndGeneratePdf() async {
+    List<Uint8List> images = [];
+
+    // Capturar cada gráfico usando sus respectivas GlobalKey
+    images.add(await _capturePng(_globalKey1));
+    images.add(await _capturePng(_globalKey2));
+    //images.add(await _capturePng(_globalKey3));
+    Uint8List headerImageBytes = await _loadHeaderImage();
+    _generatePDFWithGraphs(images, headerImageBytes);
   }
 
   @override
@@ -181,131 +542,149 @@ class _ResultsState extends State<Results> {
                       ),
                     ),
                   ),
-                  puntajeTotal == null
-                      ? CircularProgressIndicator()
-                      : DonaConValorCentral(puntaje: puntajeTotal!),
-                  Text(
-                    'Su nivel es: ',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
+                  RepaintBoundary(
+                    key: _globalKey1,
+                    child: Column(children: [
+                      puntajeTotal == null
+                          ? CircularProgressIndicator()
+                          : DonaConValorCentral(puntaje: puntajeTotal!),
+                      Text(
+                        'Su nivel es: ',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      puntajeTotal == null
+                          ? CircularProgressIndicator()
+                          : RandomPositionContainer(
+                              children: [
+                                CircleWithText('1°',
+                                    hasBorder: (puntajeTotal! >= 0 &&
+                                            puntajeTotal! <=
+                                                puntajeMaximo / 5.0)
+                                        ? true
+                                        : false),
+                                CircleWithText('2°',
+                                    hasBorder: (puntajeTotal! >=
+                                                ((puntajeMaximo / 5.0) + 1) &&
+                                            puntajeTotal! <=
+                                                (puntajeMaximo / 5.0) * 2)
+                                        ? true
+                                        : false),
+                                CircleWithText('3°',
+                                    hasBorder: (puntajeTotal! >=
+                                                ((puntajeMaximo / 5.0) * 2 +
+                                                    1) &&
+                                            puntajeTotal! <=
+                                                (puntajeMaximo / 5.0) * 3)
+                                        ? true
+                                        : false),
+                                CircleWithText('4°',
+                                    hasBorder: (puntajeTotal! >=
+                                                ((puntajeMaximo / 5.0) * 3 +
+                                                    1) &&
+                                            puntajeTotal! <=
+                                                (puntajeMaximo / 5.0) * 4)
+                                        ? true
+                                        : false),
+                                CircleWithText('5°',
+                                    hasBorder: (puntajeTotal! >=
+                                                ((puntajeMaximo / 5.0) * 4 +
+                                                    1) &&
+                                            puntajeTotal! <=
+                                                (puntajeMaximo / 5.0) * 5)
+                                        ? true
+                                        : false),
+                              ],
+                            ),
+                      tablaNiveles(),
+                    ]),
+                  ),
+                  RepaintBoundary(
+                    key: _globalKey2,
+                    child: Column(
+                      children: [
+                        RadarWidget(
+                          skewing: 0,
+                          radarMap: RadarMapModel(
+                            legend: [
+                              LegendModel(
+                                  '', const Color.fromARGB(166, 134, 13, 108)),
+                            ],
+                            indicator: [
+                              IndicatorModel("G. Organizacional",
+                                  puntajeDimensionMax[0].toDouble()),
+                              IndicatorModel("G. Productiva Primaria",
+                                  puntajeDimensionMax[1].toDouble()),
+                              IndicatorModel(
+                                  "G. de Diseño y Desarrollo de Productos",
+                                  puntajeDimensionMax[2].toDouble()),
+                              IndicatorModel("G. de Acabados Textiles",
+                                  puntajeDimensionMax[3].toDouble()),
+                              IndicatorModel("G. de la Comerzializacion",
+                                  puntajeDimensionMax[4].toDouble()),
+                              IndicatorModel("G. de Finanzas",
+                                  puntajeDimensionMax[5].toDouble()),
+                              IndicatorModel("G. Tributación",
+                                  puntajeDimensionMax[6].toDouble()),
+                              IndicatorModel("Educación",
+                                  puntajeDimensionMax[7].toDouble()),
+                              IndicatorModel("Transporte",
+                                  puntajeDimensionMax[8].toDouble()),
+                              IndicatorModel("Telecomunicaciones",
+                                  puntajeDimensionMax[9].toDouble()),
+                              IndicatorModel(
+                                  "Salud", puntajeDimensionMax[10].toDouble()),
+                              IndicatorModel("Agua y Saneamiento",
+                                  puntajeDimensionMax[11].toDouble()),
+                              IndicatorModel("G. Ambiental",
+                                  puntajeDimensionMax[12].toDouble()),
+                              IndicatorModel("Tecnologiía  e Innovación",
+                                  puntajeDimensionMax[13].toDouble()),
+                            ],
+                            data: [
+                              //   MapDataModel([48,32.04,1.00,94.5,19,60,50,30,19,60,50]),
+                              //MapDataModel([42.59,34.04,1.10,68,74,30,19,60,50,19,30,50,19,30]),
+                              //MapDataModel([60.0, 8.0, 0.0, 60.0, 1.0, 4.0, 3.0, 2.0, 8.0, 7.0, 6.0, 7.0, 0.0, 4.0]),
+                              MapDataModel(puntajeDimension
+                                  .map((e) => e.toDouble())
+                                  .toList()),
+                            ],
+                            radius: 105,
+                            duration: 2000,
+                            shape: Shape.square,
+                            maxWidth: 60,
+                            line: LineModel(4),
+                          ),
+                          textStyle: const TextStyle(
+                              color: Colors.black, fontSize: 10),
+                          isNeedDrawLegend: true,
+                          lineText: (p, length) => "${(p * 100 ~/ length)}%",
+                          dilogText: (IndicatorModel indicatorModel,
+                              List<LegendModel> legendModels,
+                              List<double> mapDataModels) {
+                            StringBuffer text = StringBuffer("");
+                            for (int i = 0; i < mapDataModels.length; i++) {
+                              text.write(
+                                  "${legendModels[i].name} : ${mapDataModels[i].toString()}");
+                              if (i != mapDataModels.length - 1) {
+                                text.write("\n");
+                              }
+                            }
+                            return text.toString();
+                          },
+                          outLineText: (data, max) => "${data * 100 ~/ max}%",
+                        ),
+                        puntajeTotal == null
+                            ? CircularProgressIndicator()
+                            : TableD(
+                                puntajeDimension: puntajeDimension,
+                                puntajeDimensionMax: puntajeDimensionMax,
+                              ),
+                      ],
                     ),
                   ),
-                  puntajeTotal == null
-                      ? CircularProgressIndicator()
-                      : RandomPositionContainer(
-                          children: [
-                            CircleWithText('1°',
-                                hasBorder: (puntajeTotal! >= 0 &&
-                                        puntajeTotal! <= puntajeMaximo / 5.0)
-                                    ? true
-                                    : false),
-                            CircleWithText('2°',
-                                hasBorder: (puntajeTotal! >=
-                                            ((puntajeMaximo / 5.0) + 1) &&
-                                        puntajeTotal! <=
-                                            (puntajeMaximo / 5.0) * 2)
-                                    ? true
-                                    : false),
-                            CircleWithText('3°',
-                                hasBorder: (puntajeTotal! >=
-                                            ((puntajeMaximo / 5.0) * 2 + 1) &&
-                                        puntajeTotal! <=
-                                            (puntajeMaximo / 5.0) * 3)
-                                    ? true
-                                    : false),
-                            CircleWithText('4°',
-                                hasBorder: (puntajeTotal! >=
-                                            ((puntajeMaximo / 5.0) * 3 + 1) &&
-                                        puntajeTotal! <=
-                                            (puntajeMaximo / 5.0) * 4)
-                                    ? true
-                                    : false),
-                            CircleWithText('5°',
-                                hasBorder: (puntajeTotal! >=
-                                            ((puntajeMaximo / 5.0) * 4 + 1) &&
-                                        puntajeTotal! <=
-                                            (puntajeMaximo / 5.0) * 5)
-                                    ? true
-                                    : false),
-                          ],
-                        ),
-                  tablaNiveles(),
-                  RadarWidget(
-                    skewing: 0,
-                    radarMap: RadarMapModel(
-                      legend: [
-                        LegendModel(
-                            '', const Color.fromARGB(166, 134, 13, 108)),
-                      ],
-                      indicator: [
-                        IndicatorModel("G. Organizacional",
-                            puntajeDimensionMax[0].toDouble()),
-                        IndicatorModel("G. Productiva Primaria",
-                            puntajeDimensionMax[1].toDouble()),
-                        IndicatorModel("G. de Diseño y Desarrollo de Productos",
-                            puntajeDimensionMax[2].toDouble()),
-                        IndicatorModel("G. de Acabados Textiles",
-                            puntajeDimensionMax[3].toDouble()),
-                        IndicatorModel("G. de la Comerzializacion",
-                            puntajeDimensionMax[4].toDouble()),
-                        IndicatorModel("G. de Finanzas",
-                            puntajeDimensionMax[5].toDouble()),
-                        IndicatorModel("G. Tributación",
-                            puntajeDimensionMax[6].toDouble()),
-                        IndicatorModel(
-                            "Educación", puntajeDimensionMax[7].toDouble()),
-                        IndicatorModel(
-                            "Transporte", puntajeDimensionMax[8].toDouble()),
-                        IndicatorModel("Telecomunicaciones",
-                            puntajeDimensionMax[9].toDouble()),
-                        IndicatorModel(
-                            "Salud", puntajeDimensionMax[10].toDouble()),
-                        IndicatorModel("Agua y Saneamiento",
-                            puntajeDimensionMax[11].toDouble()),
-                        IndicatorModel(
-                            "G. Ambiental", puntajeDimensionMax[12].toDouble()),
-                        IndicatorModel("Tecnologiía  e Innovación",
-                            puntajeDimensionMax[13].toDouble()),
-                      ],
-                      data: [
-                        //   MapDataModel([48,32.04,1.00,94.5,19,60,50,30,19,60,50]),
-                        //MapDataModel([42.59,34.04,1.10,68,74,30,19,60,50,19,30,50,19,30]),
-                        //MapDataModel([60.0, 8.0, 0.0, 60.0, 1.0, 4.0, 3.0, 2.0, 8.0, 7.0, 6.0, 7.0, 0.0, 4.0]),
-                        MapDataModel(
-                            puntajeDimension.map((e) => e.toDouble()).toList()),
-                      ],
-                      radius: 105,
-                      duration: 2000,
-                      shape: Shape.square,
-                      maxWidth: 60,
-                      line: LineModel(4),
-                    ),
-                    textStyle:
-                        const TextStyle(color: Colors.black, fontSize: 10),
-                    isNeedDrawLegend: true,
-                    lineText: (p, length) => "${(p * 100 ~/ length)}%",
-                    dilogText: (IndicatorModel indicatorModel,
-                        List<LegendModel> legendModels,
-                        List<double> mapDataModels) {
-                      StringBuffer text = StringBuffer("");
-                      for (int i = 0; i < mapDataModels.length; i++) {
-                        text.write(
-                            "${legendModels[i].name} : ${mapDataModels[i].toString()}");
-                        if (i != mapDataModels.length - 1) {
-                          text.write("\n");
-                        }
-                      }
-                      return text.toString();
-                    },
-                    outLineText: (data, max) => "${data * 100 ~/ max}%",
-                  ),
-                  puntajeTotal == null
-                      ? CircularProgressIndicator()
-                      : TableD(
-                          puntajeDimension: puntajeDimension,
-                          puntajeDimensionMax: puntajeDimensionMax,
-                        ),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 20),
                     child: ElevatedButton(
@@ -331,6 +710,10 @@ class _ResultsState extends State<Results> {
                   ElevatedButton(
                     onPressed: _generatePDF,
                     child: Text('Generar PDFff'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _captureAndGeneratePdf,
+                    child: Text('Generar PDF con Gráficos'),
                   ),
                 ],
               ),
