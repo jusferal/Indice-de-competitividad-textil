@@ -79,7 +79,16 @@ class _FormularioState extends State<Formulario> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           List<Category> selectedCategories = [];
-          for (Category category in categories_data) {
+          Map<String, Category> categoriesMap = getCategories();
+          if (categoriesMap.containsKey(_selectedOrganization)) {
+            selectedCategories.add(categoriesMap[_selectedOrganization]!);
+          }
+          for (String activity in _Activities) {
+            if (categoriesMap.containsKey(activity)) {
+              selectedCategories.add(categoriesMap[activity]!);
+            }
+          }
+          /*for (Category category in categories_data) {
             if (category.name == _selectedOrganization) {
               selectedCategories.add(category);
               print('nombre de la categoria seleccionada: ${category.name}');
@@ -90,7 +99,7 @@ class _FormularioState extends State<Formulario> {
                 selectedCategories.add(category);
               }
             }
-          }
+          }*/
 
           /*await supabase.from('Respuestas').insert({
             'dimension': 'dimension 1',
@@ -103,35 +112,51 @@ class _FormularioState extends State<Formulario> {
           print('organizacion: $_selectedOrganization');
           print('actividades $_Activities');
 
-          Queue<Category> queue = Queue.from(selectedCategories);
-          for (Category category in categories_data) {
-            if (category.name == 'Gestión de Acabados Textiles' ||
-                category.name == 'Gestión de la Comercialización' ||
-                category.name == 'Gestión de Finanzas' ||
-                category.name == 'Gestión de la Tributación' ||
-                category.name == 'Educación' ||
-                category.name == 'Transporte' ||
-                category.name == 'Telecomunicaciones' ||
-                category.name == 'Salud' ||
-                category.name == 'Agua y Saneamiento' ||
-                category.name == 'Tecnologia e Innovación' ||
-                (_selectedOrganization == 'Emprendedor' &&
-                    category.name == 'G. Ambiental Emprendedor') ||
-                ((_selectedOrganization == 'Asociación' ||
-                        _selectedOrganization == 'Cooperativa') &&
-                    category.name == 'G. Ambiental Asociacion/Cooperativa') ||
-                (_selectedOrganization == 'Empresa ' &&
-                    category.name == 'G. Ambiental Empresa')) {
-              selectedCategories.add(category);
+          List<String> values = [
+            'Gestión de Acabados Textiles',
+            'Gestión de la Comercialización',
+            'Gestión de Finanzas',
+            'Gestión de la Tributación',
+            'Educación',
+            'Transporte',
+            'Telecomunicaciones',
+            'Salud',
+            'Agua y Saneamiento',
+            'Tecnologia e Innovación',
+          ];
+          for (var val in values) {
+            if (categoriesMap.containsKey(val)) {
+              selectedCategories.add(categoriesMap[val]!);
             }
           }
-          print('longitud de la cola antes de pasar a next: ${queue.length}');
+          if (_selectedOrganization == 'Emprendedor' &&
+              categoriesMap.containsKey('G. Ambiental Emprendedor')) {
+            selectedCategories.add(categoriesMap['G. Ambiental Emprendedor']!);
+          }
+          if ((_selectedOrganization == 'Asociación' ||
+                  _selectedOrganization == 'Cooperativa') &&
+              categoriesMap
+                  .containsKey('G. Ambiental Asociacion/Cooperativa')) {
+            selectedCategories
+                .add(categoriesMap['G. Ambiental Asociacion/Cooperativa']!);
+          }
+          if (_selectedOrganization == 'Empresa ' &&
+              categoriesMap.containsKey('G. Ambiental Empresa')) {
+            selectedCategories.add(categoriesMap['G. Ambiental Empresa']!);
+          }
 
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  NextForm(categories: selectedCategories, id: widget.id, name: widget.name,code: 0,globalAnswers: {},indexCategories: 0,used: {},),
+              builder: (context) => NextForm(
+                categories: selectedCategories,
+                id: widget.id,
+                name: widget.name,
+                code: 0,
+                globalAnswers: {},
+                indexCategories: 0,
+                used: {},
+              ),
             ),
           );
           print('Actividad seleccionada: $_selectedOrganization');

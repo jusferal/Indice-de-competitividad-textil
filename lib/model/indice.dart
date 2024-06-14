@@ -6,6 +6,8 @@ class Option {
 }
 
 class Question {
+  static int _idCounter = 0;
+  final int id;
   final String text;
   final List<Option> options;
   final int typeWidget;
@@ -13,7 +15,8 @@ class Question {
   final int behavior;
   final int totalScore;
   Question(this.text, this.options, this.typeWidget, this.isVisible,
-      this.behavior, this.totalScore);
+      this.behavior, this.totalScore)
+      : id = _idCounter++;
 }
 
 class Category {
@@ -829,7 +832,6 @@ List<Category> categories_data = [
         [
           Option('Silver', 0),
           Option('Brother', 0),
-          
           Option('Otro (Especifique)', 0),
           Option('Ninguna de las anteriores', 0),
         ],
@@ -855,7 +857,6 @@ List<Category> categories_data = [
         [
           Option('Singer', 0),
           Option('Longxing', 0),
-          
           Option('Otro (Especifique)', 0),
           Option('Ninguna de las anteriores', 0),
         ],
@@ -961,7 +962,6 @@ List<Category> categories_data = [
         [
           Option('Costura', 1),
           Option('Remallado', 1),
-          
           Option('Costura y Remallado', 3),
           Option('Ninguna de las anteriores', 0),
         ],
@@ -1210,7 +1210,7 @@ List<Category> categories_data = [
           ],
           1,
           false,
-          3,  
+          3,
           0),
     ],
   ),
@@ -1657,8 +1657,7 @@ List<Category> categories_data = [
             Option('Ferias y eventos locales', 1),
             Option('Tienda física propia', 2),
             Option('Ninguna de las anteriores', 0),
-                        Option('Otros (especificar)', 1),
-
+            Option('Otros (especificar)', 1),
           ],
           1,
           true,
@@ -1718,9 +1717,8 @@ List<Category> categories_data = [
             Option('Inteligencia Artificial', 2),
             Option('Mailing o correos electrónicos', 2),
             Option('Administrador de anuncios', 2),
-            
-             Option('Ninguna de las anteriores', 0),
-             Option('OtroS (Especifique)', 1),
+            Option('Ninguna de las anteriores', 0),
+            Option('OtroS (Especifique)', 1),
           ],
           1,
           true,
@@ -1737,7 +1735,6 @@ List<Category> categories_data = [
                 3),
             Option('Marketing con influencers', 3),
             Option('Paginas web', 2),
-            
             Option('Ninguna de las anteriores', 0),
             Option('OtroS (Especifique)', 1),
           ],
@@ -2429,8 +2426,8 @@ List<Category> categories_data = [
           '¿Qué prácticas realiza su hogar o con su actividad económica para cuidar el medio ambiente?',
           [
             Option('Separamos los residuos sólidos para su reciclaje.', 1),
-            Option('Reutilizamos materiales en la fabricación de productos.',
-                1),
+            Option(
+                'Reutilizamos materiales en la fabricación de productos.', 1),
             Option('Reducimos el consumo de agua y energía.', 1),
             Option('Ninguna de las anteriores', 0),
           ],
@@ -2512,8 +2509,8 @@ List<Category> categories_data = [
           '¿Qué prácticas realiza su asociación para cuidar el medio ambiente?',
           [
             Option('Separamos los residuos sólidos para su reciclaje.', 1),
-            Option('Reutilizamos materiales en la fabricación de productos.',
-                1),
+            Option(
+                'Reutilizamos materiales en la fabricación de productos.', 1),
             Option('Reducimos el consumo de agua y energía.', 1),
             Option('Ninguna de las anteriores', 0),
           ],
@@ -2786,3 +2783,12 @@ List<Category> categories_data = [
     ],
   ),
 ];
+
+Map<String, Category> getCategories() {
+  Map<String, Category> categoriesMap = {};
+
+  for (var category in categories_data) {
+    categoriesMap[category.name] = category;
+  }
+  return categoriesMap;
+}

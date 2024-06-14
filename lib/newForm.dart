@@ -61,7 +61,9 @@ class _NextFormState extends State<NextForm> {
     widget.categories.forEach((elemento) {
       print(elemento.name);
     });
-    print(widget.used);
+     widget.used.forEach((elemento) {
+      print(elemento.name);
+    });
   }
 
   @override
@@ -129,57 +131,58 @@ class _NextFormState extends State<NextForm> {
           onPressed: () async {
             if (allQuestionsAnswered()) {
               print('comenzand');
-
+              Map<String, Category> categoriesMap = getCategories();
               int newCode = 0;
               for (var i = 0; i < category.questions.length; i++) {
                 if (category.questions[i].behavior != 2 &&
                     category.questions[i].behavior != 3) continue;
                 if (!answers.containsKey(i)) continue;
-                for (Category category in categories_data) {
-                  print(answers[i]?['response']);
-                  final options;
-                  if (answers[i]?['response'] is String) {
-                    options = [answers[i]?['response']];
-                  } else {
-                    options = answers[i]?['response'];
-                  }
-                  print(options);
 
-                  for (final option in options) {
-                    if (option == category.name &&
-                        (category.name == 'Prendas Tejidas a Punto' ||
-                            category.name == 'Peletería' ||
-                            category.name == 'Tejido Plano en Telar' ||
-                            category.name == 'Prendas' ||
-                            category.name == 'Accesorios' ||
-                            category.name == 'DecoHome' ||
-                            category.name == 'Teñido industrial' ||
-                            category.name ==
-                                'Teñido artesanal (Plantas y químicos)' ||
-                            category.name ==
-                                'Teñidos natural (Uso de plantas, flores y raíces)')) {
-                      if (category.name == 'Prendas Tejidas a Punto')
-                        newCode = 1;
-                      if (category.name == 'Peletería') newCode = 2;
-                      if (category.name == 'Tejido Plano en Telar') newCode = 3;
-                      setState(() {
-                        Item val = new Item(
-                            name: category.name,
-                            prevIndex: widget.indexCategories);
-                        Set<String> values = {};
-                        widget.used.forEach((element) {
-                          if (element.prevIndex == widget.indexCategories) {
-                            values.add(element.name);
-                            widget.used.remove(element);
-                          }
-                        });
-                        if (!widget.used.contains(val)) {
-                          widget.categories
-                              .insert(widget.indexCategories + 1, category);
-                          widget.used.add(val);
+                print(answers[i]?['response']);
+                final options;
+                if (answers[i]?['response'] is String) {
+                  options = [answers[i]?['response']];
+                } else {
+                  options = answers[i]?['response'];
+                }
+                print(options);
+
+                for (final option in options) {
+                  if (categoriesMap.containsKey(option) &&
+                      (categoriesMap.containsKey('Prendas Tejidas a Punto') ||
+                          categoriesMap.containsKey('Peletería') ||
+                          categoriesMap.containsKey('Tejido Plano en Telar') ||
+                          categoriesMap.containsKey('Prendas') ||
+                          categoriesMap.containsKey('Accesorios') ||
+                          categoriesMap.containsKey('DecoHome') ||
+                          categoriesMap.containsKey('Teñido industrial') ||
+                          categoriesMap.containsKey(
+                              'Teñido artesanal (Plantas y químicos)') ||
+                          categoriesMap.containsKey(
+                              'Teñidos natural (Uso de plantas, flores y raíces)'))) {
+                    if (categoriesMap.containsKey('Prendas Tejidas a Punto'))
+                      newCode = 1;
+                    if (categoriesMap.containsKey('Peletería')) newCode = 2;
+                    if (categoriesMap.containsKey('Tejido Plano en Telar'))
+                      newCode = 3;
+                      
+                    setState(() {
+                      print('------------------- $option');
+                      Item val = new Item(
+                          name: option, prevIndex: widget.indexCategories);
+                      Set<String> values = {};
+                      widget.used.forEach((element) {
+                        if (element.prevIndex == widget.indexCategories) {
+                          values.add(element.name);
+                          //widget.used.remove(element);
                         }
                       });
-                    }
+                      if (!widget.used.contains(val)) {
+                        widget.categories
+                            .insert(widget.indexCategories + 1, categoriesMap[option]!);
+                        widget.used.add(val);
+                      }
+                    });
                   }
                 }
               }
@@ -189,7 +192,7 @@ class _NextFormState extends State<NextForm> {
                 print(elemento.name);
               });
               await saveDataToSupabase();
-              saveAnswers();
+              await saveAnswers();
               print(
                   'lens: ${widget.indexCategories} ${widget.categories.length}');
               if (widget.indexCategories + 1 < widget.categories.length) {
@@ -249,7 +252,7 @@ class _NextFormState extends State<NextForm> {
 
   Future<void> saveAnswers() async {
     for (var entry in answers.entries) {
-      widget.globalAnswers[entry.key] = entry.value;
+      widget.globalAnswers[entry.value['idQuestion']] = entry.value;
     }
   }
 
@@ -306,6 +309,7 @@ class _NextFormState extends State<NextForm> {
                       'response': value,
                       'score': option.score,
                       'maxScore': question.totalScore,
+                      'idQuestion': question.id
                     };
                     if (value == 'Si') {
                       if (index < category.questions.length - 1 &&
@@ -468,6 +472,7 @@ class _NextFormState extends State<NextForm> {
                             selectedOptions.isNotEmpty ? selectedOptions : '',
                         'score': min(totalScore, question.totalScore),
                         'maxScore': question.totalScore,
+                        'idQuestion': question.id
                       };
 
                       if (selectedOptions.contains('Otros (Especifique)') &&
@@ -516,6 +521,7 @@ class _NextFormState extends State<NextForm> {
                                 orElse: () => Option('', 0))
                             .score,
                         'maxScore': question.totalScore,
+                        'idQuestion': question.id
                       };
                     } else {
                       answers[index]?['response'] = answers[index]?['response']
@@ -568,6 +574,7 @@ class _NextFormState extends State<NextForm> {
                   'response': value,
                   'score': question.options[0].score,
                   'maxScore': question.totalScore,
+                  'idQuestion': question.id
                 };
               });
             },

@@ -109,22 +109,27 @@ class _ResultsState extends State<Results> {
 
   Future<void> _generatePDF() async {
     final pdf = pdfWidgets.Document();
-    final font = await PdfGoogleFonts.nunitoExtraLight();
-   // Añadir las respuestas al PDF
+    //final font = await PdfGoogleFonts.nunitoExtraLight();
+    // Añadir las respuestas al PDF
+    print(widget.answeres);
     widget.answeres.forEach((index, answer) {
       final question = answer['question'];
       final response = answer['response'];
+      print('$index: $question -> $response');
       pdf.addPage(pdfWidgets.Page(
-        build: (context) => pdfWidgets.Column(
-          crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-          children: [
-            pdfWidgets.Text('Pregunta: $question',
-                style: pdfWidgets.TextStyle(font: font)),
-            pdfWidgets.SizedBox(height: 5),
-            pdfWidgets.Text('Respuesta: $response'),
-            pdfWidgets.SizedBox(height: 15),
-          ],
-        ),
+        build: (context) {
+          return pdfWidgets.Column(
+            crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+            children: [
+              pdfWidgets.Text(
+                'Pregunta: $question',
+              ),
+              pdfWidgets.SizedBox(height: 5),
+              pdfWidgets.Text('Respuesta: $response'),
+              pdfWidgets.SizedBox(height: 15),
+            ],
+          );
+        },
       ));
     });
 
@@ -733,15 +738,18 @@ class _TableDState extends State<TableD> {
             TableRow(
               children: [
                 TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.fill,
+                  verticalAlignment: TableCellVerticalAlignment.intrinsicHeight,
                   child: Container(
                     alignment: Alignment.center,
-                    color: Color.fromARGB(255, 55, 212, 212),
+                    color: Color.fromARGB(255, 40, 199, 151),
                     child: RotatedBox(
                       quarterTurns: 3,
-                      child: Text('Externo',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                      child: Center(
+                        child: Text('Externo',
+                            textAlign: TextAlign.center,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                      ),
                     ),
                   ),
                 ),

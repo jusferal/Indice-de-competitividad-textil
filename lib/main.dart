@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ict/registro.dart';
 import 'package:ict/roadmap.dart';
+import 'package:ict/test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {

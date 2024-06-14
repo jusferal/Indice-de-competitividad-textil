@@ -35,8 +35,15 @@ class _pruebaState extends State<prueba> {
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
-          return pw.Center(
-            child: pw.Text('Hola, este es un PDF generado desde Flutter!'),
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text('Pregunta: quessss',
+                  ),
+              pw.SizedBox(height: 5),
+              pw.Text('Respuesta: ressss'),
+              pw.SizedBox(height: 15),
+            ],
           );
         },
       ),
