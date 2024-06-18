@@ -18,6 +18,9 @@ class NextForm extends StatefulWidget {
   final Map<int, Map<String, dynamic>> globalAnswers;
   final int indexCategories;
   final Set<Item> used;
+  final String document;
+  final List<String> activity;
+  final String organization;
   const NextForm(
       {super.key,
       required this.categories,
@@ -26,7 +29,10 @@ class NextForm extends StatefulWidget {
       required this.code,
       required this.globalAnswers,
       required this.indexCategories,
-      required this.used});
+      required this.used,
+      required this.document,
+      required this.activity,
+      required this.organization});
 
   @override
   State<NextForm> createState() => _NextFormState();
@@ -72,7 +78,7 @@ class _NextFormState extends State<NextForm> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 122, 51, 129),
-          automaticallyImplyLeading: false,
+          automaticallyImplyLeading: true,
           title: Center(
             child: Text(
               category.variable,
@@ -146,26 +152,24 @@ class _NextFormState extends State<NextForm> {
                   options = answers[i]?['response'];
                 }
                 print(options);
-
+                List<String> val = [
+                  'Prendas Tejidas a Punto',
+                  'Peletería',
+                  'Tejido Plano en Telar',
+                  'Prendas',
+                  'Accesorios',
+                  'DecoHome',
+                  'Teñido industrial',
+                  'Teñido artesanal (Plantas y químicos)',
+                  'Teñidos natural (Uso de plantas, flores y raíces)',
+                ];
                 for (final option in options) {
-                  if (categoriesMap.containsKey(option) &&
-                      (categoriesMap.containsKey('Prendas Tejidas a Punto') ||
-                          categoriesMap.containsKey('Peletería') ||
-                          categoriesMap.containsKey('Tejido Plano en Telar') ||
-                          categoriesMap.containsKey('Prendas') ||
-                          categoriesMap.containsKey('Accesorios') ||
-                          categoriesMap.containsKey('DecoHome') ||
-                          categoriesMap.containsKey('Teñido industrial') ||
-                          categoriesMap.containsKey(
-                              'Teñido artesanal (Plantas y químicos)') ||
-                          categoriesMap.containsKey(
-                              'Teñidos natural (Uso de plantas, flores y raíces)'))) {
-                    if (categoriesMap.containsKey('Prendas Tejidas a Punto'))
-                      newCode = 1;
-                    if (categoriesMap.containsKey('Peletería')) newCode = 2;
-                    if (categoriesMap.containsKey('Tejido Plano en Telar'))
-                      newCode = 3;
-
+                  if (!categoriesMap.containsKey(option)) continue;
+                  for (final v in val) {
+                    if (option != v || !categoriesMap.containsKey(v)) continue;
+                    if (option == 'Prendas Tejidas a Punto') newCode = 1;
+                    if (option == 'Peletería') newCode = 2;
+                    if (option == 'Tejido Plano en Telar') newCode = 3;
                     setState(() {
                       print('------------------- $option');
                       Item val = new Item(
@@ -207,6 +211,9 @@ class _NextFormState extends State<NextForm> {
                       globalAnswers: widget.globalAnswers,
                       indexCategories: widget.indexCategories + 1,
                       used: widget.used,
+                      document: widget.document,
+                      activity: widget.activity,
+                      organization: widget.organization,
                     ),
                   ),
                 );
@@ -219,6 +226,9 @@ class _NextFormState extends State<NextForm> {
                       name: widget.name,
                       code: newCode != 0 ? newCode : widget.code,
                       answeres: widget.globalAnswers,
+                      document: widget.document,
+                      activity: widget.activity,
+                      organization: widget.organization,
                     ),
                   ),
                 );

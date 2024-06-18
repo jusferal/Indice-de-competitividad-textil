@@ -2,8 +2,10 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -24,12 +26,18 @@ class Results extends StatefulWidget {
   final String name;
   final int code;
   final Map<int, Map<String, dynamic>> answeres;
+  final String document;
+  final List<String> activity;
+  final String organization;
   const Results(
       {super.key,
       required this.id,
       required this.name,
       required this.code,
-      required this.answeres});
+      required this.answeres,
+      required this.document,
+      required this.activity,
+      required this.organization});
   @override
   State<Results> createState() => _ResultsState();
 }
@@ -93,7 +101,7 @@ class _ResultsState extends State<Results> {
     puntajeTotal = 0;
     print('el id es: ${widget.id}');
     print(response);
-    for (var pregunta in response) {
+    /*for (var pregunta in response) {
       print(pregunta);
       puntajeTotal = puntajeTotal! + (pregunta['score'] as int);
       for (var i = 0; i < Dimensiones.length; i++) {
@@ -101,7 +109,19 @@ class _ResultsState extends State<Results> {
           puntajeDimension[i] += (pregunta['score'] as int);
         }
       }
-    }
+    }*/
+    List<int> puntajes = List.filled(14, 0);
+    int total = 0;
+    widget.answeres.forEach((index, answer) {
+      print('${answer['question']} ${answer['score']}');
+      puntajeTotal = puntajeTotal! + (answer['score'] as int);
+      for (var i = 0; i < Dimensiones.length; i++) {
+        if (Dimensiones[i] == answer['variable']) {
+          puntajeDimension[i] += (answer['score'] as int);
+        }
+      }
+    });
+    print('$total $puntajes');
     setState(() {});
     print(puntajeTotal);
     print(puntajeDimension);
@@ -357,8 +377,8 @@ class _ResultsState extends State<Results> {
               fit: pdfWidgets.BoxFit.contain,
               width: PdfPageFormat
                   .a4.width, // Ajusta el ancho al máximo de la página A4
-              height: PdfPageFormat.a4.height *
-                  0.1, // Ajusta la altura al 10% de la página A4
+              height: PdfPageFormat
+                  .a4.height, // Ajusta la altura al 10% de la página A4
             ),
           );
         },
@@ -467,7 +487,7 @@ class _ResultsState extends State<Results> {
                 width: PdfPageFormat.a4.width *
                     1.8, // Ajusta el ancho al 80% de la página A4
                 height: PdfPageFormat.a4.height *
-                    1.5, // Ajusta la altura al 40% de la página A4
+                    0.8, // Ajusta la altura al 40% de la página A4
                 fit: pdfWidgets.BoxFit.contain, // Ajusta el ajuste de la imagen
               ),
             );
@@ -478,7 +498,7 @@ class _ResultsState extends State<Results> {
 
     String? outputPath = await FilePicker.platform.saveFile(
       dialogTitle: 'Save PDF to...',
-      fileName: 'charts.pdf',
+      fileName: 'graficos.pdf',
     );
 
     if (outputPath != null) {
@@ -497,13 +517,14 @@ class _ResultsState extends State<Results> {
   }
 
   // Capturar y generar el PDF con todos los gráficos
-  void _captureAndGeneratePdf() async {
+  Future<List<Uint8List>> _captureAndGeneratePdf() async {
     List<Uint8List> images = [];
 
     // Capturar cada gráfico usando sus respectivas GlobalKey
     images.add(await _capturePng(_globalKey1));
     images.add(await _capturePng(_globalKey2));
     //images.add(await _capturePng(_globalKey3));
+    return images;
     Uint8List headerImageBytes = await _loadHeaderImage();
     _generatePDFWithGraphs(images, headerImageBytes);
   }
@@ -514,7 +535,7 @@ class _ResultsState extends State<Results> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color.fromARGB(255, 122, 51, 129),
-          automaticallyImplyLeading: false,
+          automaticallyImplyLeading: true,
           title: Center(
             child: const Text(
               'Resultados',
@@ -605,76 +626,82 @@ class _ResultsState extends State<Results> {
                     key: _globalKey2,
                     child: Column(
                       children: [
-                        RadarWidget(
-                          skewing: 0,
-                          radarMap: RadarMapModel(
-                            legend: [
-                              LegendModel(
-                                  '', const Color.fromARGB(166, 134, 13, 108)),
-                            ],
-                            indicator: [
-                              IndicatorModel("G. Organizacional",
-                                  puntajeDimensionMax[0].toDouble()),
-                              IndicatorModel("G. Productiva Primaria",
-                                  puntajeDimensionMax[1].toDouble()),
-                              IndicatorModel(
-                                  "G. de Diseño y Desarrollo de Productos",
-                                  puntajeDimensionMax[2].toDouble()),
-                              IndicatorModel("G. de Acabados Textiles",
-                                  puntajeDimensionMax[3].toDouble()),
-                              IndicatorModel("G. de la Comerzializacion",
-                                  puntajeDimensionMax[4].toDouble()),
-                              IndicatorModel("G. de Finanzas",
-                                  puntajeDimensionMax[5].toDouble()),
-                              IndicatorModel("G. Tributación",
-                                  puntajeDimensionMax[6].toDouble()),
-                              IndicatorModel("Educación",
-                                  puntajeDimensionMax[7].toDouble()),
-                              IndicatorModel("Transporte",
-                                  puntajeDimensionMax[8].toDouble()),
-                              IndicatorModel("Telecomunicaciones",
-                                  puntajeDimensionMax[9].toDouble()),
-                              IndicatorModel(
-                                  "Salud", puntajeDimensionMax[10].toDouble()),
-                              IndicatorModel("Agua y Saneamiento",
-                                  puntajeDimensionMax[11].toDouble()),
-                              IndicatorModel("G. Ambiental",
-                                  puntajeDimensionMax[12].toDouble()),
-                              IndicatorModel("Tecnologiía  e Innovación",
-                                  puntajeDimensionMax[13].toDouble()),
-                            ],
-                            data: [
-                              //   MapDataModel([48,32.04,1.00,94.5,19,60,50,30,19,60,50]),
-                              //MapDataModel([42.59,34.04,1.10,68,74,30,19,60,50,19,30,50,19,30]),
-                              //MapDataModel([60.0, 8.0, 0.0, 60.0, 1.0, 4.0, 3.0, 2.0, 8.0, 7.0, 6.0, 7.0, 0.0, 4.0]),
-                              MapDataModel(puntajeDimension
-                                  .map((e) => e.toDouble())
-                                  .toList()),
-                            ],
-                            radius: 105,
-                            duration: 2000,
-                            shape: Shape.square,
-                            maxWidth: 60,
-                            line: LineModel(4),
-                          ),
-                          textStyle: const TextStyle(
-                              color: Colors.black, fontSize: 10),
-                          isNeedDrawLegend: true,
-                          lineText: (p, length) => "${(p * 100 ~/ length)}%",
-                          dilogText: (IndicatorModel indicatorModel,
-                              List<LegendModel> legendModels,
-                              List<double> mapDataModels) {
-                            StringBuffer text = StringBuffer("");
-                            for (int i = 0; i < mapDataModels.length; i++) {
-                              text.write(
-                                  "${legendModels[i].name} : ${mapDataModels[i].toString()}");
-                              if (i != mapDataModels.length - 1) {
-                                text.write("\n");
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 30),
+                          child: RadarWidget(
+                            skewing: 0,
+                            radarMap: RadarMapModel(
+                              legend: [
+                                LegendModel(
+                                    '', ui.Color.fromARGB(166, 122, 51, 129)),
+                              ],
+                              indicator: [
+                                IndicatorModel("G. Organizacional",
+                                    puntajeDimensionMax[0].toDouble(),
+                                    textColor: Colors.amber),
+                                IndicatorModel("G. Productiva Primaria",
+                                    puntajeDimensionMax[1].toDouble()),
+                                IndicatorModel(
+                                    "G. de Diseño y Desarrollo de Productos",
+                                    puntajeDimensionMax[2].toDouble()),
+                                IndicatorModel("G. de Acabados Textiles",
+                                    puntajeDimensionMax[3].toDouble()),
+                                IndicatorModel("G. de la Comerzializacion",
+                                    puntajeDimensionMax[4].toDouble()),
+                                IndicatorModel("G. de Finanzas",
+                                    puntajeDimensionMax[5].toDouble()),
+                                IndicatorModel("G. Tributación",
+                                    puntajeDimensionMax[6].toDouble()),
+                                IndicatorModel("Educación",
+                                    puntajeDimensionMax[7].toDouble()),
+                                IndicatorModel("Transporte",
+                                    puntajeDimensionMax[8].toDouble()),
+                                IndicatorModel("Telecomunicaciones",
+                                    puntajeDimensionMax[9].toDouble()),
+                                IndicatorModel("Salud",
+                                    puntajeDimensionMax[10].toDouble()),
+                                IndicatorModel("Agua y Saneamiento",
+                                    puntajeDimensionMax[11].toDouble()),
+                                IndicatorModel("G. Ambiental",
+                                    puntajeDimensionMax[12].toDouble()),
+                                IndicatorModel("Tecnologiía  e Innovación",
+                                    puntajeDimensionMax[13].toDouble()),
+                              ],
+                              data: [
+                                //   MapDataModel([48,32.04,1.00,94.5,19,60,50,30,19,60,50]),
+                                //MapDataModel([42.59,34.04,1.10,68,74,30,19,60,50,19,30,50,19,30]),
+                                //MapDataModel([60.0, 8.0, 0.0, 60.0, 1.0, 4.0, 3.0, 2.0, 8.0, 7.0, 6.0, 7.0, 0.0, 4.0]),
+                                MapDataModel(puntajeDimension
+                                    .map((e) => e.toDouble())
+                                    .toList()),
+                              ],
+                              radius: 104,
+                              duration: 2000,
+                              shape: Shape.square,
+                              maxWidth: 60,
+                              line: LineModel(4),
+                            ),
+                            textStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold),
+                            isNeedDrawLegend: false,
+                            lineText: (p, length) => "${(p * 100 ~/ length)}%",
+                            dilogText: (IndicatorModel indicatorModel,
+                                List<LegendModel> legendModels,
+                                List<double> mapDataModels) {
+                              StringBuffer text = StringBuffer("");
+                              for (int i = 0; i < mapDataModels.length; i++) {
+                                text.write(
+                                    "${legendModels[i].name} : ${mapDataModels[i].toString()}");
+                                if (i != mapDataModels.length - 1) {
+                                  text.write("\n");
+                                }
                               }
-                            }
-                            return text.toString();
-                          },
-                          outLineText: (data, max) => "${data * 100 ~/ max}%",
+                              return text.toString();
+                            },
+                            outLineText: (data, max) => "${data * 100 ~/ max}%",
+                          ),
                         ),
                         puntajeTotal == null
                             ? CircularProgressIndicator()
@@ -688,10 +715,20 @@ class _ResultsState extends State<Results> {
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 20),
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        List<Uint8List> images = await _captureAndGeneratePdf();
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => RoadMap()),
+                          MaterialPageRoute(
+                              builder: (context) => RoadMap(
+                                    images: images,
+                                    answers: widget.answeres,
+                                    id: widget.id,
+                                    name: widget.name,
+                                    document: widget.document,
+                                    activity: widget.activity,
+                                    organization: widget.organization,
+                                  )),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -740,8 +777,10 @@ class _ResultsState extends State<Results> {
           '${((puntajeMaximo / 5.0) * i + (i != 0 ? 1 : 0)).toStringAsFixed(1)} - ${((puntajeMaximo / 5.0) * (i + 1)).toStringAsFixed(1)} puntos';
     }
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 20),
-      padding: EdgeInsets.symmetric(horizontal: 7),
+      margin: EdgeInsets.only(
+        bottom: 20,
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 5),
       child: Table(
         columnWidths: {
           0: FixedColumnWidth(50.0),
@@ -944,7 +983,7 @@ class RandomPositionContainer extends StatelessWidget {
 
     return Container(
       width: 300,
-      height: 300,
+      height: 260,
       child: Stack(
         children: positionedChildren,
       ),

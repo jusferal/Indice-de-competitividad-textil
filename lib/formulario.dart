@@ -8,7 +8,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class Formulario extends StatefulWidget {
   final String id;
   final String name;
-  const Formulario({super.key, required this.id, required this.name});
+  final String document;
+  const Formulario({super.key, required this.id, required this.name, required this.document});
 
   @override
   State<Formulario> createState() => _FormularioState();
@@ -156,6 +157,9 @@ class _FormularioState extends State<Formulario> {
                 globalAnswers: {},
                 indexCategories: 0,
                 used: {},
+                 document: widget.document,
+                                    activity: _Activities,
+                                    organization: _selectedOrganization,
               ),
             ),
           );

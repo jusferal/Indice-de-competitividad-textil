@@ -2320,8 +2320,8 @@ List<Category> categories_data = [
             Option('No', 0),
           ],
           0,
-          true,
-          0,
+          false,
+          1,
           1),
       Question(
           '¿Con qué frecuencia hace uso de su Seguro Integral de Salud (SIS)?',

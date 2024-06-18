@@ -203,7 +203,10 @@ class _RegistroState extends State<Registro> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => Formulario(
-                                  id: data[0]['id'], name: data[0]['name']),
+                                id: data[0]['id'],
+                                name: data[0]['name'],
+                                document: _dniController.text,
+                              ),
                             ),
                           );
                         }
