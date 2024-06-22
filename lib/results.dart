@@ -61,10 +61,28 @@ class _ResultsState extends State<Results> {
     "Gestión Ambiental",
     "Tecnologia e Innovación",
   ];
-  List<int> puntajeDimension = List.filled(14, 0); // Rellena la lista con 0s
+  List<String> summaryDimensions = [
+    "G. Organizacional",
+    "G. Productiva Primaria",
+    "G. de Diseño y Desarrollo de Productos",
+    "G. de Acabados Textiles",
+    "G. de la Comercialización",
+    "G. de Finanzas",
+    "G. de la Tributación",
+    "Educación",
+    "Transporte",
+    "Telecomunicaciones",
+    "Salud",
+    "Agua y Saneamiento",
+    "G. Ambiental",
+    "Tecnologia e Innovación",
+  ];
+  List<int> puntajeDimension = List.filled(14, -1); // Rellena la lista con 0s
   List<int> puntajeDimensionMax = List.filled(14, 0);
+  List<double> percentage = List.filled(14, 0);
   final GlobalKey _globalKey1 = GlobalKey();
   final GlobalKey _globalKey2 = GlobalKey();
+  Set<String> dimensionUsed = {};
   @override
   void initState() {
     super.initState();
@@ -78,7 +96,7 @@ class _ResultsState extends State<Results> {
         : widget.code == 2
             ? puntajeDimensionMax[2] = 10
             : puntajeDimensionMax[2] = 8;
-    puntajeDimensionMax[3] = 19;
+    puntajeDimensionMax[3] = 31;
     puntajeDimensionMax[4] = 73;
     puntajeDimensionMax[5] = 8;
     puntajeDimensionMax[6] = 12;
@@ -110,18 +128,26 @@ class _ResultsState extends State<Results> {
         }
       }
     }*/
-    List<int> puntajes = List.filled(14, 0);
-    int total = 0;
+    widget.answeres.forEach((index, answer) {
+      for (var i = 0; i < Dimensiones.length; i++) {
+        if (Dimensiones[i] == answer['variable']) {
+          dimensionUsed.add(Dimensiones[i]);
+        }
+      }
+    });
     widget.answeres.forEach((index, answer) {
       print('${answer['question']} ${answer['score']}');
       puntajeTotal = puntajeTotal! + (answer['score'] as int);
       for (var i = 0; i < Dimensiones.length; i++) {
         if (Dimensiones[i] == answer['variable']) {
+          if (puntajeDimension[i] == -1) puntajeDimension[i] = 0;
           puntajeDimension[i] += (answer['score'] as int);
         }
       }
     });
-    print('$total $puntajes');
+    for (var i = 0; i < Dimensiones.length; i++) {
+      percentage[i] = puntajeDimension[i] / puntajeDimensionMax[i];
+    }
     setState(() {});
     print(puntajeTotal);
     print(puntajeDimension);
@@ -361,7 +387,7 @@ class _ResultsState extends State<Results> {
 
   // Función para generar el PDF con todas las imágenes de gráficos capturadas
   Future<void> _generatePDFWithGraphs(
-      List<Uint8List> images, Uint8List headerImageBytes) async {
+      Set<Uint8List> images, Uint8List headerImageBytes) async {
     final pdf = pdfWidgets.Document();
     final headerImage = pdfWidgets.MemoryImage(headerImageBytes);
 
@@ -517,8 +543,8 @@ class _ResultsState extends State<Results> {
   }
 
   // Capturar y generar el PDF con todos los gráficos
-  Future<List<Uint8List>> _captureAndGeneratePdf() async {
-    List<Uint8List> images = [];
+  Future<Set<Uint8List>> _captureAndGeneratePdf() async {
+    Set<Uint8List> images = {};
 
     // Capturar cada gráfico usando sus respectivas GlobalKey
     images.add(await _capturePng(_globalKey1));
@@ -570,7 +596,7 @@ class _ResultsState extends State<Results> {
                           ? CircularProgressIndicator()
                           : DonaConValorCentral(puntaje: puntajeTotal!),
                       Text(
-                        'Su nivel es: ',
+                        'Su nivel competitividad es:',
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -619,6 +645,17 @@ class _ResultsState extends State<Results> {
                                         : false),
                               ],
                             ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        child: Text(
+                          'Niveles de competitividad según el puntaje',
+                          textAlign: ui.TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                       tablaNiveles(),
                     ]),
                   ),
@@ -626,6 +663,13 @@ class _ResultsState extends State<Results> {
                     key: _globalKey2,
                     child: Column(
                       children: [
+                        Text(
+                          'Mapa de Radar',
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         Container(
                           margin: EdgeInsets.symmetric(vertical: 30),
                           child: RadarWidget(
@@ -635,43 +679,21 @@ class _ResultsState extends State<Results> {
                                 LegendModel(
                                     '', ui.Color.fromARGB(166, 122, 51, 129)),
                               ],
-                              indicator: [
-                                IndicatorModel("G. Organizacional",
-                                    puntajeDimensionMax[0].toDouble(),
-                                    textColor: Colors.amber),
-                                IndicatorModel("G. Productiva Primaria",
-                                    puntajeDimensionMax[1].toDouble()),
-                                IndicatorModel(
-                                    "G. de Diseño y Desarrollo de Productos",
-                                    puntajeDimensionMax[2].toDouble()),
-                                IndicatorModel("G. de Acabados Textiles",
-                                    puntajeDimensionMax[3].toDouble()),
-                                IndicatorModel("G. de la Comerzializacion",
-                                    puntajeDimensionMax[4].toDouble()),
-                                IndicatorModel("G. de Finanzas",
-                                    puntajeDimensionMax[5].toDouble()),
-                                IndicatorModel("G. Tributación",
-                                    puntajeDimensionMax[6].toDouble()),
-                                IndicatorModel("Educación",
-                                    puntajeDimensionMax[7].toDouble()),
-                                IndicatorModel("Transporte",
-                                    puntajeDimensionMax[8].toDouble()),
-                                IndicatorModel("Telecomunicaciones",
-                                    puntajeDimensionMax[9].toDouble()),
-                                IndicatorModel("Salud",
-                                    puntajeDimensionMax[10].toDouble()),
-                                IndicatorModel("Agua y Saneamiento",
-                                    puntajeDimensionMax[11].toDouble()),
-                                IndicatorModel("G. Ambiental",
-                                    puntajeDimensionMax[12].toDouble()),
-                                IndicatorModel("Tecnologiía  e Innovación",
-                                    puntajeDimensionMax[13].toDouble()),
-                              ],
+                              indicator: List.generate(summaryDimensions.length,
+                                      (index) => index)
+                                  .where((index) => dimensionUsed
+                                      .contains(Dimensiones[index]))
+                                  .map((index) => IndicatorModel(
+                                        summaryDimensions[index],
+                                        puntajeDimensionMax[index].toDouble(),
+                                      ))
+                                  .toList(),
                               data: [
                                 //   MapDataModel([48,32.04,1.00,94.5,19,60,50,30,19,60,50]),
                                 //MapDataModel([42.59,34.04,1.10,68,74,30,19,60,50,19,30,50,19,30]),
                                 //MapDataModel([60.0, 8.0, 0.0, 60.0, 1.0, 4.0, 3.0, 2.0, 8.0, 7.0, 6.0, 7.0, 0.0, 4.0]),
                                 MapDataModel(puntajeDimension
+                                    .where((e) => e >= 0)
                                     .map((e) => e.toDouble())
                                     .toList()),
                               ],
@@ -686,7 +708,7 @@ class _ResultsState extends State<Results> {
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold),
                             isNeedDrawLegend: false,
-                            lineText: (p, length) => "${(p * 100 ~/ length)}%",
+                            //lineText: (p, length) => "${(p * 100 ~/ length)}%",
                             dilogText: (IndicatorModel indicatorModel,
                                 List<LegendModel> legendModels,
                                 List<double> mapDataModels) {
@@ -703,11 +725,20 @@ class _ResultsState extends State<Results> {
                             outLineText: (data, max) => "${data * 100 ~/ max}%",
                           ),
                         ),
+                        Text(
+                          'Factores de evaluación de competitivad',
+                          textAlign: ui.TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         puntajeTotal == null
                             ? CircularProgressIndicator()
                             : TableD(
                                 puntajeDimension: puntajeDimension,
                                 puntajeDimensionMax: puntajeDimensionMax,
+                                dimensionUsed: dimensionUsed,
                               ),
                       ],
                     ),
@@ -716,7 +747,7 @@ class _ResultsState extends State<Results> {
                     margin: const EdgeInsets.symmetric(vertical: 20),
                     child: ElevatedButton(
                       onPressed: () async {
-                        List<Uint8List> images = await _captureAndGeneratePdf();
+                        Set<Uint8List> images = await _captureAndGeneratePdf();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -728,6 +759,7 @@ class _ResultsState extends State<Results> {
                                     document: widget.document,
                                     activity: widget.activity,
                                     organization: widget.organization,
+                                    percentage: percentage,
                                   )),
                         );
                       },
@@ -743,14 +775,6 @@ class _ResultsState extends State<Results> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _generatePDF,
-                    child: Text('Generar PDFff'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _captureAndGeneratePdf,
-                    child: Text('Generar PDF con Gráficos'),
                   ),
                 ],
               ),
@@ -994,11 +1018,13 @@ class RandomPositionContainer extends StatelessWidget {
 class TableD extends StatefulWidget {
   final List<int> puntajeDimension;
   final List<int> puntajeDimensionMax;
+  final Set<String> dimensionUsed;
 
   const TableD({
     super.key,
     required this.puntajeDimension,
     required this.puntajeDimensionMax,
+    required this.dimensionUsed,
   });
 
   @override
@@ -1007,7 +1033,7 @@ class TableD extends StatefulWidget {
 
 class _TableDState extends State<TableD> {
   List<List<String>> tableData = [];
-
+  Set<int> outIndex = {};
   @override
   void initState() {
     super.initState();
@@ -1035,6 +1061,7 @@ class _TableDState extends State<TableD> {
     tableData[13][0] = "Tecnología e Innovación";
 
     for (int i = 0; i < 14; i++) {
+      if (widget.puntajeDimension[i] < 0) outIndex.add(i);
       tableData[i][1] = widget.puntajeDimensionMax[i].toString();
       tableData[i][2] = widget.puntajeDimension[i].toString();
       double porcentaje =
@@ -1130,28 +1157,28 @@ class _TableDState extends State<TableD> {
                   },
                   border: TableBorder.symmetric(inside: BorderSide()),
                   children: [
-                    ...tableData.sublist(0, 7).map(
-                          (row) => TableRow(
-                            children: row.map(
-                              (cell) {
-                                return TableCell(
-                                  verticalAlignment: TableCellVerticalAlignment
-                                      .intrinsicHeight,
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    padding: const EdgeInsets.all(2.0),
-                                    color: getColor(cell),
-                                    child: Text(
-                                      cell,
-                                      softWrap: true,
-                                      maxLines: 3,
-                                      textAlign: TextAlign.center,
-                                    ),
+                    for (int i = 0; i < 7; i++)
+                      if (!outIndex.contains(i))
+                        TableRow(
+                          children: tableData[i].map(
+                            (cell) {
+                              return TableCell(
+                                verticalAlignment:
+                                    TableCellVerticalAlignment.intrinsicHeight,
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(2.0),
+                                  color: getColor(cell),
+                                  child: Text(
+                                    cell,
+                                    softWrap: true,
+                                    maxLines: 3,
+                                    textAlign: TextAlign.center,
                                   ),
-                                );
-                              },
-                            ).toList(),
-                          ),
+                                ),
+                              );
+                            },
+                          ).toList(),
                         ),
                   ],
                 )

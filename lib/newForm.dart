@@ -56,9 +56,9 @@ class _NextFormState extends State<NextForm> {
     }
     for (var i = 0; i < category.questions.length; i++) {
       bool isOtherOption = category.questions[i].options
-          .any((option) => option.text == 'Otro (Especifique)');
+          .any((option) => option.typeOption == 'otro');
 
-      if (isOtherOption || category.questions[i].typeWidget == 2) {
+      if (isOtherOption || category.questions[i].typeWidget == 'edit') {
         textEditingControllerMap[i] = TextEditingController();
       }
     }
@@ -70,6 +70,123 @@ class _NextFormState extends State<NextForm> {
     widget.used.forEach((elemento) {
       print(elemento.name);
     });
+  }
+
+  bool isLoading = false;
+  Future<void> gettingNewxtCategories() async {
+    setState(() {
+      isLoading = true; // Inicia la carga
+    });
+    try {
+      if (allQuestionsAnswered()) {
+        Map<String, Category> categoriesMap = getCategories();
+        int newCode = 0;
+        for (var i = 0; i < category.questions.length; i++) {
+          if (category.questions[i].behavior != 'launcher' &&
+              category.questions[i].behavior != 'hiddenLauncher') continue;
+          if (!answers.containsKey(i)) continue;
+          final options;
+          if (answers[i]?['response'] is String) {
+            options = [answers[i]?['response']];
+          } else {
+            options = answers[i]?['response'];
+          }
+          List<String> val = [
+            'Prendas Tejidas a Punto',
+            'Peletería',
+            'Tejido Plano en Telar',
+            'Prendas',
+            'Accesorios',
+            'DecoHome',
+            'Teñido industrial',
+            'Teñido artesanal (Plantas y químicos)',
+            'Teñidos natural (Uso de plantas, flores y raíces)',
+          ];
+          for (final option in options) {
+            if (!categoriesMap.containsKey(option)) continue;
+            for (final v in val) {
+              if (option != v || !categoriesMap.containsKey(v)) continue;
+              if (option == 'Prendas Tejidas a Punto') newCode = 1;
+              if (option == 'Peletería') newCode = 2;
+              if (option == 'Tejido Plano en Telar') newCode = 3;
+              setState(() {
+                Item val =
+                    new Item(name: option, prevIndex: widget.indexCategories);
+                Set<String> values = {};
+                widget.used.forEach((element) {
+                  if (element.prevIndex == widget.indexCategories) {
+                    values.add(element.name);
+                  }
+                });
+                if (!widget.used.contains(val)) {
+                  widget.categories.insert(
+                      widget.indexCategories + 1, categoriesMap[option]!);
+                  widget.used.add(val);
+                }
+              });
+            }
+          }
+        }
+        await saveDataToSupabase();
+        await saveAnswers();
+        if (widget.indexCategories + 1 < widget.categories.length) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NextForm(
+                categories: widget.categories,
+                id: widget.id,
+                name: widget.name,
+                code: newCode != 0 ? newCode : widget.code,
+                globalAnswers: widget.globalAnswers,
+                indexCategories: widget.indexCategories + 1,
+                used: widget.used,
+                document: widget.document,
+                activity: widget.activity,
+                organization: widget.organization,
+              ),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => new Results(
+                id: widget.id,
+                name: widget.name,
+                code: newCode != 0 ? newCode : widget.code,
+                answeres: widget.globalAnswers,
+                document: widget.document,
+                activity: widget.activity,
+                organization: widget.organization,
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text('Ocurrió un error: $e'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      setState(() {
+        isLoading = false; // Finaliza la carga
+      });
+    }
   }
 
   @override
@@ -89,150 +206,103 @@ class _NextFormState extends State<NextForm> {
             ),
           ),
         ),
-        body: Form(
-          child: Column(
-            children: [
-              if (category.name != category.variable)
-                Center(
-                  child: Text(
-                    category.name,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.bold,
+        body: Stack(
+          children: [
+            Form(
+              child: Column(
+                children: [
+                  if (category.name != category.variable)
+                    Center(
+                      child: Text(
+                        category.name,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 25.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: ListView.builder(
+                        itemCount: category.questions.length,
+                        itemBuilder: (context, index) {
+                          final question = category.questions[index];
+                          switch (question.typeWidget) {
+                            case 'unique':
+                              return Visibility(
+                                  visible: question.isVisible,
+                                  child: buildRadioListTile(question, index));
+                            case 'multiple':
+                              return Visibility(
+                                  visible: question.isVisible,
+                                  child:
+                                      buildCheckboxListTile(question, index));
+                            case 'edit':
+                              return Visibility(
+                                  visible: question.isVisible,
+                                  child: buildTextFormField(question, index));
+                            default:
+                              return const SizedBox();
+                          }
+                        },
+                      ),
                     ),
                   ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      child: ElevatedButton(
+                        onPressed: (){},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(166, 134, 13, 108),
+                          elevation: 3,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
+                        ),
+                        child: const Text(
+                          'Anterior',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      child: ElevatedButton(
+                        onPressed: (){},
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(166, 134, 13, 108),
+                          elevation: 3,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
+                        ),
+                        child: const Text(
+                          'Siguiente',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: ListView.builder(
-                    itemCount: category.questions.length,
-                    itemBuilder: (context, index) {
-                      final question = category.questions[index];
-                      switch (question.typeWidget) {
-                        case 0:
-                          return Visibility(
-                              visible: question.isVisible,
-                              child: buildRadioListTile(question, index));
-                        case 1:
-                          return Visibility(
-                              visible: question.isVisible,
-                              child: buildCheckboxListTile(question, index));
-                        case 2:
-                          return Visibility(
-                              visible: question.isVisible,
-                              child: buildTextFormField(question, index));
-                        default:
-                          return const SizedBox();
-                      }
-                    },
-                  ),
+                ],
+              ),
+            ),
+            if (isLoading)
+              Container(
+                color: Colors.black45,
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             if (allQuestionsAnswered()) {
-              print('comenzand');
-              Map<String, Category> categoriesMap = getCategories();
-              int newCode = 0;
-              for (var i = 0; i < category.questions.length; i++) {
-                if (category.questions[i].behavior != 2 &&
-                    category.questions[i].behavior != 3) continue;
-                if (!answers.containsKey(i)) continue;
-
-                print(answers[i]?['response']);
-                final options;
-                if (answers[i]?['response'] is String) {
-                  options = [answers[i]?['response']];
-                } else {
-                  options = answers[i]?['response'];
-                }
-                print(options);
-                List<String> val = [
-                  'Prendas Tejidas a Punto',
-                  'Peletería',
-                  'Tejido Plano en Telar',
-                  'Prendas',
-                  'Accesorios',
-                  'DecoHome',
-                  'Teñido industrial',
-                  'Teñido artesanal (Plantas y químicos)',
-                  'Teñidos natural (Uso de plantas, flores y raíces)',
-                ];
-                for (final option in options) {
-                  if (!categoriesMap.containsKey(option)) continue;
-                  for (final v in val) {
-                    if (option != v || !categoriesMap.containsKey(v)) continue;
-                    if (option == 'Prendas Tejidas a Punto') newCode = 1;
-                    if (option == 'Peletería') newCode = 2;
-                    if (option == 'Tejido Plano en Telar') newCode = 3;
-                    setState(() {
-                      print('------------------- $option');
-                      Item val = new Item(
-                          name: option, prevIndex: widget.indexCategories);
-                      Set<String> values = {};
-                      widget.used.forEach((element) {
-                        if (element.prevIndex == widget.indexCategories) {
-                          values.add(element.name);
-                          //widget.used.remove(element);
-                        }
-                      });
-                      if (!widget.used.contains(val)) {
-                        widget.categories.insert(
-                            widget.indexCategories + 1, categoriesMap[option]!);
-                        widget.used.add(val);
-                      }
-                    });
-                  }
-                }
-              }
-              print('teminooooooooooooooooo');
-              print('elementos antes de pasar');
-              widget.categories.forEach((elemento) {
-                print(elemento.name);
-              });
-              await saveDataToSupabase();
-              await saveAnswers();
-              print(
-                  'lens: ${widget.indexCategories} ${widget.categories.length}');
-              if (widget.indexCategories + 1 < widget.categories.length) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NextForm(
-                      categories: widget.categories,
-                      id: widget.id,
-                      name: widget.name,
-                      code: newCode != 0 ? newCode : widget.code,
-                      globalAnswers: widget.globalAnswers,
-                      indexCategories: widget.indexCategories + 1,
-                      used: widget.used,
-                      document: widget.document,
-                      activity: widget.activity,
-                      organization: widget.organization,
-                    ),
-                  ),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => new Results(
-                      id: widget.id,
-                      name: widget.name,
-                      code: newCode != 0 ? newCode : widget.code,
-                      answeres: widget.globalAnswers,
-                      document: widget.document,
-                      activity: widget.activity,
-                      organization: widget.organization,
-                    ),
-                  ),
-                );
-              }
+              await gettingNewxtCategories();
             } else {
               showDialog(
                 context: context,
@@ -305,94 +375,132 @@ class _NextFormState extends State<NextForm> {
           Text(question.text),
           Column(
             children: question.options.map((option) {
-              return RadioListTile(
-                title: Text(option.text),
-                value: option.text,
-                groupValue: answers[index]?['response']?.split(':')[0] ?? '',
-                onChanged: (value) {
-                  setState(() {
-                    answers[index] = {
-                      'dimension': category.dimension,
-                      'variable': category.variable,
-                      'category': category.name,
-                      'question': question.text,
-                      'response': value,
-                      'score': option.score,
-                      'maxScore': question.totalScore,
-                      'idQuestion': question.id
-                    };
-                    if (value == 'Si') {
-                      if (index < category.questions.length - 1 &&
-                          category.questions[index + 1].isVisible == false &&
-                          (category.questions[index + 1].behavior == 1 ||
-                              category.questions[index + 1].behavior == 3)) {
-                        category.questions[index + 1].isVisible = true;
-                        if (question.text ==
-                            '¿Conoce cuantos productos debería vender al mes para cubrir tus costos y tener un margen de ganancia?') {
+              return Column(
+                children: [
+                  RadioListTile(
+                    title: Text(option.text),
+                    value: option.text,
+                    groupValue:
+                        answers[index]?['response']?.split(':')[0] ?? '',
+                    onChanged: (value) {
+                      setState(() {
+                        answers[index] = {
+                          'dimension': category.dimension,
+                          'variable': category.variable,
+                          'category': category.name,
+                          'question': question.text,
+                          'response': value,
+                          'score': min(option.score, question.totalScore),
+                          'maxScore': question.totalScore,
+                          'idQuestion': question.id
+                        };
+                        if (value == 'Si') {
+                          if (index < category.questions.length - 1 &&
+                              category.questions[index + 1].isVisible ==
+                                  false &&
+                              (category.questions[index + 1].behavior ==
+                                      'hidden' ||
+                                  category.questions[index + 1].behavior ==
+                                      'hiddenLauncher')) {
+                            category.questions[index + 1].isVisible = true;
+                            if (question.text ==
+                                '¿Conoce cuantos productos debería vender al mes para cubrir tus costos y tener un margen de ganancia?') {
+                              category.questions[index + 2].isVisible = true;
+                            }
+                          }
+                        } else if (value == 'No') {
+                          if (index < category.questions.length - 1 &&
+                              category.questions[index + 1].isVisible == true &&
+                              (category.questions[index + 1].behavior ==
+                                      'hidden' ||
+                                  category.questions[index + 1].behavior ==
+                                      'hiddenLauncher')) {
+                            category.questions[index + 1].isVisible = false;
+                            if (question.text ==
+                                '¿Conoce cuantos productos debería vender al mes para cubrir tus costos y tener un margen de ganancia?') {
+                              category.questions[index + 2].isVisible = false;
+                            }
+                          }
+                        }
+                        if (value == 'Presencial (ferias, y tiendas físicas)') {
+                          category.questions[index + 1].isVisible = true;
+                          category.questions[index + 2].isVisible = false;
+                        } else if (value ==
+                            'Digital (Redes sociales, market place, ecommerce)') {
+                          category.questions[index + 1].isVisible = false;
                           category.questions[index + 2].isVisible = true;
                         }
-                      }
-                    } else if (value == 'No') {
-                      if (index < category.questions.length - 1 &&
-                          category.questions[index + 1].isVisible == true &&
-                          (category.questions[index + 1].behavior == 1 ||
-                              category.questions[index + 1].behavior == 3)) {
-                        category.questions[index + 1].isVisible = false;
-                        if (question.text ==
-                            '¿Conoce cuantos productos debería vender al mes para cubrir tus costos y tener un margen de ganancia?') {
-                          category.questions[index + 2].isVisible = false;
-                        }
-                      }
-                    }
-                    if (value == 'Presencial (ferias, y tiendas físicas)') {
-                      category.questions[index + 1].isVisible = true;
-                      category.questions[index + 2].isVisible = false;
-                    } else if (value ==
-                        'Digital (Redes sociales, market place, ecommerce)') {
-                      category.questions[index + 1].isVisible = false;
-                      category.questions[index + 2].isVisible = true;
-                    }
 
-                    if (value == 'Otro (Especifique)') {
-                      if (!textEditingControllerMap.containsKey(index)) {
-                        textEditingControllerMap[index] =
-                            TextEditingController();
-                      }
-                      print(
-                          'contenido del textform actual: ${textEditingControllerMap[index]} en $index');
-                    } else {
-                      textEditingControllerMap[index]?.dispose();
-                      textEditingControllerMap.remove(index);
-                      //textEditingControllerMap[index]?.clear();
-                    }
-                  });
-                },
+                        if (option.typeOption == 'otro') {
+                          if (!textEditingControllerMap.containsKey(index)) {
+                            textEditingControllerMap[index] =
+                                TextEditingController();
+                          }
+                          print(
+                              'contenido del textform actual: ${textEditingControllerMap[index]} en $index');
+                        } else {
+                          textEditingControllerMap[index]?.dispose();
+                          textEditingControllerMap.remove(index);
+                          //textEditingControllerMap[index]?.clear();
+                        }
+                      });
+                    },
+                  ),
+                  if (option.typeOption == 'otro' &&
+                      answers[index]?['response']?.split(':')[0] == option.text)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 42.0),
+                      child: TextFormField(
+                        controller: textEditingControllerMap[index],
+                        decoration: const InputDecoration(
+                          hintText: 'Especifique aquí',
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            answers[index]?['response'] =
+                                '${option.text}: $value';
+                          });
+                        },
+                      ),
+                    ),
+                ],
               );
             }).toList(),
           ),
-          if (answers[index]?['response']?.split(':')[0] ==
-              'Otro (Especifique)')
-            Padding(
-              padding: const EdgeInsets.only(left: 42.0),
-              child: TextFormField(
-                controller: textEditingControllerMap[index],
-                decoration: InputDecoration(
-                  hintText: 'Especifique aquí',
-                ),
-                onChanged: (value) {
-                  print("eeeeeeeeeeeeee");
-                  setState(() {
-                    answers[index]?['response'] = 'Otro (Especifique): $value';
-                  });
-                },
-              ),
-            ),
         ],
       ),
     );
   }
 
   Widget buildCheckboxListTile(Question question, int index) {
+    // Inicializa el controlador solo si no está presente para este índice
+    if (!textEditingControllerMap.containsKey(index)) {
+      textEditingControllerMap[index] = TextEditingController();
+    }
+
+    // Verificar si hay un valor existente para la opción "otro" y actualizar el controlador una sola vez
+    if (answers[index]?['response'] is List) {
+      var otherOption = question.options.firstWhere(
+        (o) => o.typeOption == 'otro',
+        orElse: () => Option('', 0, ''), // Retorna un objeto Option vacío
+      );
+
+      if (otherOption.text.isNotEmpty &&
+          textEditingControllerMap[index]!.text.isEmpty) {
+        // Buscar el valor existente para la opción "otro"
+        var existingOtherValue = (answers[index]?['response'] as List)
+            .firstWhere((response) => response.startsWith(otherOption.text),
+                orElse: () =>
+                    ''); // Retorna una cadena vacía si no hay coincidencia
+
+        // Solo establecer el texto del controlador si existe un valor relevante
+        if (existingOtherValue.isNotEmpty) {
+          textEditingControllerMap[index]!.text =
+              existingOtherValue.split(': ').skip(1).join(': ');
+        }
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
       child: Column(
@@ -414,137 +522,181 @@ class _NextFormState extends State<NextForm> {
                 title: Text(option.text),
                 value: isSelected,
                 onChanged: (value) {
-                  setState(() {
-                    List<String> selectedOptions;
+                  // Evitar llamar a setState directamente aquí para evitar la reconstrucción durante la construcción
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      List<String> selectedOptions;
 
-                    if (answers[index]?['response'] is List) {
-                      selectedOptions =
-                          List<String>.from(answers[index]?['response']);
-                    } else if (answers[index]?['response'] is String) {
-                      selectedOptions = [answers[index]?['response']];
-                    } else {
-                      selectedOptions = [];
-                    }
+                      if (answers[index]?['response'] is List) {
+                        selectedOptions =
+                            List<String>.from(answers[index]?['response']);
+                      } else if (answers[index]?['response'] is String) {
+                        selectedOptions = [answers[index]?['response']];
+                      } else {
+                        selectedOptions = [];
+                      }
 
-                    if (value != null) {
-                      if (value) {
-                        if (option.text == 'Ninguna de las anteriores') {
-                          selectedOptions.clear();
-                          selectedOptions.add(option.text);
-                        } else if (option.text == 'Todas las anteriores') {
-                          selectedOptions.clear();
-                          selectedOptions.addAll(question.options
-                              .where((o) =>
-                                  o.text != 'Ninguna de las anteriores' &&
-                                  o.text != 'Otro (Especifique)')
-                              .map((o) => o.text));
+                      if (value != null) {
+                        if (value) {
+                          switch (option.typeOption) {
+                            case 'ninguno':
+                              // Selecciona "Ninguna de las anteriores" y deselecciona las demás
+                              selectedOptions.clear();
+                              selectedOptions.add(option.text);
+                              break;
+                            case 'todas':
+                              // Selecciona todas las opciones, excepto "Ninguna de las anteriores" y "Otro (Especifique)"
+                              selectedOptions.clear();
+                              selectedOptions.addAll(question.options
+                                  .where((o) =>
+                                      o.typeOption != 'ninguno' &&
+                                      o.typeOption != 'otro')
+                                  .map((o) => o.text));
+                              break;
+                            case 'otro':
+                              // Marca la opción "Otro (Especifique)"
+                              if (!selectedOptions.contains(option.text)) {
+                                selectedOptions.add(option.text);
+                              }
+                              break;
+                            default:
+                              // Selecciona la opción normal
+                              selectedOptions.add(option.text);
+                              // Deselecciona cualquier opción de tipo 'ninguno' si está seleccionada
+                              selectedOptions.removeWhere((opt) => question
+                                  .options
+                                  .where((o) => o.typeOption == 'ninguno')
+                                  .map((o) => o.text)
+                                  .contains(opt));
+                              break;
+                          }
                         } else {
-                          selectedOptions.add(option.text);
-                          if (selectedOptions
-                              .contains('Ninguna de las anteriores')) {
-                            selectedOptions.remove('Ninguna de las anteriores');
+                          selectedOptions.remove(option.text);
+                          if (option.typeOption == 'todas') {
+                            // Deselecciona todas las opciones
+                            selectedOptions.clear();
                           }
                         }
-                      } else {
-                        selectedOptions.remove(option.text);
-                        if (option.text == 'Todas las anteriores') {
-                          selectedOptions.clear();
+
+                        // Asegura que la opción "Todas las anteriores" sea coherente
+                        if (selectedOptions.contains('Todas las anteriores') &&
+                            selectedOptions.length <
+                                question.options.length ) {
+                          selectedOptions.remove('Todas las anteriores');
+                        }
+
+                        // Asegura que la opción "Ninguna de las anteriores" sea coherente
+                        if (question.options
+                                .where((o) => o.typeOption == 'ninguno')
+                                .map((o) => o.text)
+                                .any(selectedOptions.contains) &&
+                            selectedOptions.length > 1) {
+                          selectedOptions
+                              .removeWhere((element) => element != option.text);
+                        }
+
+                        // Actualiza la lista de respuestas
+                        answers[index] = {
+                          'dimension': category.dimension,
+                          'variable': category.variable,
+                          'category': category.name,
+                          'question': question.text,
+                          'response':
+                              selectedOptions.isNotEmpty ? selectedOptions : '',
+                          'score': min(
+                              selectedOptions
+                                  .map((selectedOption) => question.options
+                                      .firstWhere(
+                                          (opt) => opt.text == selectedOption,
+                                          orElse: () => Option('', 0, ''))
+                                      .score)
+                                  .fold(
+                                      0,
+                                      (previousValue, score) =>
+                                          previousValue + score),
+                              question.totalScore),
+                          'maxScore': question.totalScore,
+                          'idQuestion': question.id
+                        };
+
+                        // Si se selecciona la opción "otro", limpia el campo si no tiene valor relevante
+                        if (option.typeOption == 'otro' &&
+                            textEditingControllerMap[index]!.text.isEmpty) {
+                          textEditingControllerMap[index]!.clear();
                         }
                       }
-
-                      if (selectedOptions.contains('Todas las anteriores') &&
-                          selectedOptions.length <
-                              question.options.length - 1) {
-                        selectedOptions.remove('Todas las anteriores');
-                      }
-
-                      if (selectedOptions
-                              .contains('Ninguna de las anteriores') &&
-                          selectedOptions.length > 1) {
-                        selectedOptions.removeWhere((element) =>
-                            element != 'Ninguna de las anteriores');
-                      }
-
-                      int totalScore = selectedOptions
-                          .map((selectedOption) => question.options
-                              .firstWhere((opt) => opt.text == selectedOption,
-                                  orElse: () => Option('', 0))
-                              .score)
-                          .fold(0,
-                              (previousValue, score) => previousValue + score);
-
-                      answers[index] = {
-                        'dimension': category.dimension,
-                        'variable': category.variable,
-                        'category': category.name,
-                        'question': question.text,
-                        'response':
-                            selectedOptions.isNotEmpty ? selectedOptions : '',
-                        'score': min(totalScore, question.totalScore),
-                        'maxScore': question.totalScore,
-                        'idQuestion': question.id
-                      };
-
-                      if (selectedOptions.contains('Otros (Especifique)') &&
-                          !textEditingControllerMap.containsKey(index)) {
-                        textEditingControllerMap[index] =
-                            TextEditingController();
-                      } else if (!selectedOptions
-                          .contains('Otros (Especifique)')) {
-                        textEditingControllerMap[index]?.dispose();
-                        textEditingControllerMap.remove(index);
-                      }
-                    }
+                    });
                   });
                 },
               );
             }).toList(),
           ),
+          // Verificar si se debe mostrar el campo de texto para la opción "otro"
           if ((answers[index]?['response'] is List &&
-                  (answers[index]?['response'] as List)
-                      .contains('Otros (Especifique)')) ||
+                  (answers[index]?['response'] as List).any((response) =>
+                      question.options
+                          .where((o) => o.typeOption == 'otro')
+                          .map((o) => o.text)
+                          .contains(response))) ||
               (answers[index]?['response'] is String &&
-                  (answers[index]?['response'] as String)
-                      .startsWith('Otros (Especifique)')))
+                  question.options
+                      .where((o) => o.typeOption == 'otro')
+                      .map((o) => o.text)
+                      .any((text) => (answers[index]?['response'] as String)
+                          .startsWith(text))))
             Padding(
               padding: const EdgeInsets.only(left: 42.0),
               child: TextFormField(
                 controller: textEditingControllerMap[index],
+                // No llamar a setState en cada cambio de texto
                 onChanged: (value) {
+                  // Aquí no hacemos nada con setState para evitar la reconstrucción constante
+                },
+                onEditingComplete: () {
+                  // Actualizar el estado global solo cuando el usuario ha terminado de editar
                   setState(() {
-                    if (value.isNotEmpty) {
-                      List<String> currentResponses =
-                          (answers[index]?['response'] is List)
-                              ? List<String>.from(answers[index]?['response'])
-                              : [];
-                      currentResponses.add('Otros (Especifique): $value');
+                    List<String> currentResponses =
+                        (answers[index]?['response'] is List)
+                            ? List<String>.from(answers[index]?['response'])
+                            : [];
 
-                      answers[index] = {
-                        'dimension': category.dimension,
-                        'variable': category.variable,
-                        'category': category.name,
-                        'question': question.text,
-                        'response': currentResponses,
-                        'score': question.options
-                            .firstWhere(
-                                (opt) => opt.text == 'Otros (Especifique)',
-                                orElse: () => Option('', 0))
-                            .score,
-                        'maxScore': question.totalScore,
-                        'idQuestion': question.id
-                      };
-                    } else {
-                      answers[index]?['response'] = answers[index]?['response']
-                              is List
-                          ? (answers[index]?['response'] as List)
-                              .where((response) =>
-                                  !response.startsWith('Otros (Especifique):'))
-                              .toList()
-                          : '';
+                    // Eliminar entradas existentes para la opción "otro" antes de añadir la nueva
+                    currentResponses.removeWhere((response) => question.options
+                        .where((o) => o.typeOption == 'otro')
+                        .map((o) => o.text)
+                        .any(
+                            (text) => response.startsWith(text.split(':')[0])));
+
+                    // Usar el valor actual del controlador en lugar de `value`
+                    String currentText = textEditingControllerMap[index]!.text;
+
+                    // Añadir el nuevo valor especificado si no está vacío
+                    if (currentText.isNotEmpty) {
+                      String otherText = question.options
+                          .firstWhere((o) => o.typeOption == 'otro')
+                          .text;
+                      currentResponses.add('$otherText: $currentText');
                     }
+
+                    answers[index] = {
+                      'dimension': category.dimension,
+                      'variable': category.variable,
+                      'category': category.name,
+                      'question': question.text,
+                      'response': currentResponses,
+                      'score': min(
+                          question.options
+                              .firstWhere((opt) => opt.typeOption == 'otro',
+                                  orElse: () => Option('', 0, ''))
+                              .score,
+                          question.totalScore),
+                      'maxScore': question.totalScore,
+                      'idQuestion': question.id
+                    };
                   });
                 },
-                decoration: InputDecoration(hintText: 'Ingrese otro valor'),
+                decoration:
+                    const InputDecoration(hintText: 'Ingrese otro valor'),
               ),
             ),
         ],
