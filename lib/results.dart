@@ -601,6 +601,7 @@ class _ResultsState extends State<Results> {
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
+                        textAlign: ui.TextAlign.center,
                       ),
                       puntajeTotal == null
                           ? CircularProgressIndicator()
@@ -1079,12 +1080,24 @@ class _TableDState extends State<TableD> {
     if (isPercentage(value)) {
       double percentage = double.parse(value.replaceAll('%', ''));
       if (percentage < 50.0) {
-        return Colors.red;
+        return const ui.Color.fromARGB(255, 255, 200, 206);
       } else {
-        return Color.fromARGB(255, 50, 214, 55);
+        return ui.Color.fromARGB(255, 198, 239, 205);
       }
     }
     return Colors.transparent;
+  }
+
+  Color getTextColor(String value) {
+    if (isPercentage(value)) {
+      double percentage = double.parse(value.replaceAll('%', ''));
+      if (percentage < 50.0) {
+        return const Color.fromARGB(255, 150, 20, 32);
+      } else {
+        return const Color.fromARGB(255, 15, 84, 19);
+      }
+    }
+    return Colors.black;
   }
 
   @override
@@ -1138,7 +1151,7 @@ class _TableDState extends State<TableD> {
                 TableCell(
                   verticalAlignment: TableCellVerticalAlignment.fill,
                   child: Container(
-                    color: Colors.yellow,
+                    color: const ui.Color.fromARGB(255, 254, 235, 156),
                     alignment: Alignment.center,
                     child: RotatedBox(
                       quarterTurns: 3,
@@ -1174,6 +1187,7 @@ class _TableDState extends State<TableD> {
                                     softWrap: true,
                                     maxLines: 3,
                                     textAlign: TextAlign.center,
+                                    style: TextStyle(color: getTextColor(cell)),
                                   ),
                                 ),
                               );
@@ -1225,6 +1239,8 @@ class _TableDState extends State<TableD> {
                                     child: Center(
                                       child: Text(
                                         cell,
+                                        style: TextStyle(
+                                            color: getTextColor(cell)),
                                         softWrap: true,
                                         maxLines: 3,
                                         textAlign: TextAlign.center,

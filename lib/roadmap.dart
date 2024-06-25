@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,6 +12,10 @@ import 'dart:ui' as ui;
 import 'package:ict/registro.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RoadMap extends StatefulWidget {
   final Set<Uint8List> images;
@@ -73,12 +79,23 @@ class _RoadMapState extends State<RoadMap> {
     "Gestión Ambiental",
     "Tecnologia e Innovación",
   ];
+   Future<void> requestStoragePermission() async {
+    var status = await Permission.storage.status;
+    print('Storage permission status: $status');
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+      if (!status.isGranted) {
+        print('Storage permission denied. Opening app settings.');
+        openAppSettings(); // Abre la configuración de la app para que el usuario habilite el permiso
+      }
+    }
+  }
 
   Future<void> _generatePDF() async {
     final pdf = pdfWidgets.Document();
     print(widget.answers);
     // Verificar que los datos estén presentes
-    if (widget.answers == null || widget.answers.isEmpty) {
+    if (widget.answers.isEmpty) {
       print('No hay datos para generar el PDF.');
       return;
     }
@@ -257,29 +274,35 @@ class _RoadMapState extends State<RoadMap> {
     pdf.addPage(
       pdfWidgets.MultiPage(
         build: (context) => content,
-        margin: pdfWidgets.EdgeInsets.all(
-            20), // Ajuste de márgenes según sea necesario
+        margin: pdfWidgets.EdgeInsets.all(20), // Ajuste de márgenes según sea necesario
       ),
     );
 
+    await requestStoragePermission();
+
+    // Permitir que el usuario elija la ubicación del archivo
     String? outputPath = await FilePicker.platform.saveFile(
-      dialogTitle: 'Save PDF to...',
+      dialogTitle: 'Guardar PDF como...',
       fileName: 'backup-${widget.name}.pdf',
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
     );
 
-    if (outputPath != null) {
-      final file = File(outputPath);
-      try {
-        final bytes = await pdf.save();
-        print('Tamaño del PDF en bytes: ${bytes.length}');
-        await file.writeAsBytes(bytes);
-        print('PDF saved to $outputPath');
-      } catch (e, stackTrace) {
-        print('Error saving PDF: $e');
-        print('Stack Trace: $stackTrace');
-      }
-    } else {
-      print('User canceled the picker');
+    if (outputPath == null) {
+      // Usuario canceló la operación
+      print('La operación de guardado fue cancelada.');
+      return;
+    }
+
+    final file = File(outputPath);
+    try {
+      final bytes = await pdf.save();
+      print('Tamaño del PDF en bytes: ${bytes.length}');
+      await file.writeAsBytes(bytes);
+      print('PDF guardado en $outputPath');
+    } catch (e, stackTrace) {
+      print('Error al guardar el PDF: $e');
+      print('Stack Trace: $stackTrace');
     }
   }
 
@@ -296,7 +319,7 @@ class _RoadMapState extends State<RoadMap> {
       return Uint8List(0);
     }
   }
-
+   
   Future<Uint8List> _loadHeaderImage() async {
     final ByteData data = await rootBundle.load('assets/images/header.png');
     return data.buffer.asUint8List();
@@ -497,6 +520,67 @@ class _RoadMapState extends State<RoadMap> {
     print(road);
   }
 
+  Future<void> saveDataToSupabase() async {
+    final client = Supabase.instance.client;
+
+    DateTime now = DateTime.now();
+    String fechaFormateada =
+        "${now.year}-${_formatTwoDigits(now.month)}-${_formatTwoDigits(now.day)}";
+
+    for (final answer in widget.answers.values) {
+      answer['user'] = widget.id;
+      answer['nameUser'] = widget.name;
+      answer['date'] = fechaFormateada;
+      try {
+        await client.from('Respuestas').insert(answer);
+      } catch (e) {
+        print('Error inserting to Supabase: $e');
+        await _saveLocally(answer);
+      }
+    }
+  }
+
+  Future<void> _saveLocally(Map<String, dynamic> answer) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? storedAnswers = prefs.getStringList('answers') ?? [];
+    storedAnswers.add(jsonEncode(answer));
+    await prefs.setStringList('answers', storedAnswers);
+  }
+
+  Future<void> _syncData() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? storedAnswers = prefs.getStringList('answers') ?? [];
+
+    if (storedAnswers.isNotEmpty) {
+      for (String storedAnswer in storedAnswers) {
+        Map<String, dynamic> answer = jsonDecode(storedAnswer);
+        try {
+          await Supabase.instance.client.from('Respuestas').insert(answer);
+        } catch (e) {
+          print('Error syncing to Supabase: $e');
+          return;
+        }
+      }
+      // Clear stored answers after successful sync
+      await prefs.remove('answers');
+    }
+  }
+
+  void checkConnectivityAndSync() {
+    Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> results) {
+      if (results.contains(ConnectivityResult.mobile) ||
+          results.contains(ConnectivityResult.wifi)) {
+        _syncData();
+      }
+    });
+  }
+
+  String _formatTwoDigits(int n) {
+    return n.toString().padLeft(2, '0');
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -581,7 +665,6 @@ class _RoadMapState extends State<RoadMap> {
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
-                        
                         ),
                         textAlign: TextAlign.center,
                       ),

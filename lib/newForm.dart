@@ -250,43 +250,80 @@ class _NextFormState extends State<NextForm> {
                       ),
                     ),
                   ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 20),
-                      child: ElevatedButton(
-                        onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(166, 134, 13, 108),
-                          elevation: 3,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 10),
-                        ),
-                        child: const Text(
-                          'Anterior',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 20),
-                      child: ElevatedButton(
-                        onPressed: (){},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(166, 134, 13, 108),
-                          elevation: 3,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 10),
-                        ),
-                        child: const Text(
-                          'Siguiente',
-                          style: TextStyle(color: Colors.white),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 20),
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon:
+                              const Icon(Icons.arrow_back, color: Colors.white),
+                          label: const Text(
+                            'Anterior',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(166, 134, 13, 108),
+                            elevation: 3,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 20),
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            if (allQuestionsAnswered()) {
+                              await gettingNewxtCategories();
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Error'),
+                                    content: const Text(
+                                        'Por favor, responda todas las preguntas antes de continuar.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.arrow_forward,
+                              color: Colors.white),
+                          label: const Text(
+                            'Siguiente',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(166, 134, 13, 108),
+                            elevation: 3,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -299,33 +336,7 @@ class _NextFormState extends State<NextForm> {
               ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            if (allQuestionsAnswered()) {
-              await gettingNewxtCategories();
-            } else {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: const Text('Error'),
-                    content: const Text(
-                        'Por favor, responda todas las preguntas antes de continuar.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            }
-          },
-          child: const Icon(Icons.navigate_next),
-        ),
+        
       ),
     );
   }
@@ -580,8 +591,7 @@ class _NextFormState extends State<NextForm> {
 
                         // Asegura que la opción "Todas las anteriores" sea coherente
                         if (selectedOptions.contains('Todas las anteriores') &&
-                            selectedOptions.length <
-                                question.options.length ) {
+                            selectedOptions.length < question.options.length) {
                           selectedOptions.remove('Todas las anteriores');
                         }
 
