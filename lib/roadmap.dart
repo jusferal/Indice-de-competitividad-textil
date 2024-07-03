@@ -79,17 +79,6 @@ class _RoadMapState extends State<RoadMap> {
     "Gestión Ambiental",
     "Tecnologia e Innovación",
   ];
-   Future<void> requestStoragePermission() async {
-    var status = await Permission.storage.status;
-    print('Storage permission status: $status');
-    if (!status.isGranted) {
-      status = await Permission.storage.request();
-      if (!status.isGranted) {
-        print('Storage permission denied. Opening app settings.');
-        openAppSettings(); // Abre la configuración de la app para que el usuario habilite el permiso
-      }
-    }
-  }
 
   Future<void> _generatePDF() async {
     final pdf = pdfWidgets.Document();
@@ -274,35 +263,59 @@ class _RoadMapState extends State<RoadMap> {
     pdf.addPage(
       pdfWidgets.MultiPage(
         build: (context) => content,
-        margin: pdfWidgets.EdgeInsets.all(20), // Ajuste de márgenes según sea necesario
+        margin: pdfWidgets.EdgeInsets.all(
+            20), // Ajuste de márgenes según sea necesario
       ),
     );
 
-    await requestStoragePermission();
-
-    // Permitir que el usuario elija la ubicación del archivo
-    String? outputPath = await FilePicker.platform.saveFile(
-      dialogTitle: 'Guardar PDF como...',
-      fileName: 'backup-${widget.name}.pdf',
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
-
-    if (outputPath == null) {
-      // Usuario canceló la operación
-      print('La operación de guardado fue cancelada.');
+    //await requestStoragePermission();
+    var storagePermission = await Permission.manageExternalStorage.request();
+    if (!storagePermission.isGranted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Permiso de almacenamiento denegado')),
+      );
       return;
     }
+    if (Platform.isAndroid) {
+      String? outputDirectory = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: 'Seleccione el directorio para guardar el PDF',
+      );
+      if (outputDirectory != null) {
+        final file = File('$outputDirectory/backup-${widget.name}.pdf');
+        await file.writeAsBytes(await pdf.save());
 
-    final file = File(outputPath);
-    try {
-      final bytes = await pdf.save();
-      print('Tamaño del PDF en bytes: ${bytes.length}');
-      await file.writeAsBytes(bytes);
-      print('PDF guardado en $outputPath');
-    } catch (e, stackTrace) {
-      print('Error al guardar el PDF: $e');
-      print('Stack Trace: $stackTrace');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('PDF guardado en ${file.path}')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se seleccionó ningún directorio')),
+        );
+      }
+    } else {
+      String? outputPath = await FilePicker.platform.saveFile(
+        dialogTitle: 'Guardar PDF como...',
+        fileName: 'backup-${widget.name}.pdf',
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (outputPath == null) {
+        // Usuario canceló la operación
+        print('La operación de guardado fue cancelada.');
+        return;
+      }
+
+      final file = File(outputPath);
+      try {
+        final bytes = await pdf.save();
+        print('Tamaño del PDF en bytes: ${bytes.length}');
+        await file.writeAsBytes(bytes);
+        print('PDF guardado en $outputPath');
+      } catch (e, stackTrace) {
+        print('Error al guardar el PDF: $e');
+        print('Stack Trace: $stackTrace');
+      }
     }
   }
 
@@ -319,7 +332,7 @@ class _RoadMapState extends State<RoadMap> {
       return Uint8List(0);
     }
   }
-   
+
   Future<Uint8List> _loadHeaderImage() async {
     final ByteData data = await rootBundle.load('assets/images/header.png');
     return data.buffer.asUint8List();
@@ -476,34 +489,60 @@ class _RoadMapState extends State<RoadMap> {
         ],
       ),
     );
+    var storagePermission = await Permission.manageExternalStorage.request();
+    if (!storagePermission.isGranted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Permiso de almacenamiento denegado')),
+      );
+      return;
+    }
+    if (Platform.isAndroid) {
+      String? outputDirectory = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: 'Seleccione el directorio para guardar el PDF',
+      );
+      if (outputDirectory != null) {
+        final file = File(
+            '$outputDirectory/informe-indice-competitividad-textil-${widget.name}.pdf');
+        await file.writeAsBytes(await pdf.save());
 
-    String? outputPath = await FilePicker.platform.saveFile(
-      dialogTitle: 'Save PDF to...',
-      fileName: 'informe-indice-competitividad-textil-${widget.name}.pdf',
-    );
-
-    if (outputPath != null) {
-      final file = File(outputPath);
-      try {
-        final bytes = await pdf.save();
-        await file.writeAsBytes(bytes);
-        print('PDF saved to $outputPath');
-      } catch (e, stackTrace) {
-        print('Error saving PDF: $e');
-        print('Stack Trace: $stackTrace');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('PDF guardado en ${file.path}')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No se seleccionó ningún directorio')),
+        );
       }
     } else {
-      print('User canceled the picker');
+      String? outputPath = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save PDF to...',
+        fileName: 'informe-indice-competitividad-textil-${widget.name}.pdf',
+      );
+
+      if (outputPath != null) {
+        final file = File(outputPath);
+        try {
+          final bytes = await pdf.save();
+          await file.writeAsBytes(bytes);
+          print('PDF saved to $outputPath');
+        } catch (e, stackTrace) {
+          print('Error saving PDF: $e');
+          print('Stack Trace: $stackTrace');
+        }
+      } else {
+        print('User canceled the picker');
+      }
     }
   }
 
   // Capturar y generar el PDF con todos los gráficos
   void _captureAndGeneratePdf() async {
-    Set<Uint8List> imagesRes = widget.images;
-
+    Set<Uint8List> imagesRes = Set.from(widget.images);
     // Capturar cada gráfico usando sus respectivas GlobalKey
+    print('len antes: ${imagesRes.length}');
     imagesRes.add(await _capturePng(_globalKey1));
     //images.add(await _capturePng(_globalKey3));
+    print('len despues: ${imagesRes.length}');
     Uint8List headerImageBytes = await _loadHeaderImage();
     _generatePDFWithGraphs(imagesRes, headerImageBytes);
   }
